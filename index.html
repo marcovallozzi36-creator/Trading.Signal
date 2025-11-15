@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>📊 Binance Style – Live Scanner PRO v4 (velas + sonido)</title>
+  <title>📊 Binance Style – Live Scanner PRO v5 (velas + sonido + notificaciones)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -597,6 +597,117 @@
     .stat-value.green { color: var(--green); }
     .stat-value.red   { color: var(--red); }
 
+    /* NOTIFICACIONES */
+    .notifications-panel {
+      margin-bottom: 6px;
+      padding: 6px 8px 6px;
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: radial-gradient(circle at left, rgba(15,23,42,0.95), #020309);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .notifications-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+
+    .notifications-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+
+    .notif-clear-btn {
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(75, 85, 99, 0.9);
+      background: rgba(15,23,42,0.9);
+      color: #9ca3af;
+      font-size: 10px;
+      padding: 3px 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+    }
+
+    .notif-clear-btn:hover {
+      filter: brightness(1.1);
+      border-color: rgba(148,163,184,0.9);
+    }
+
+    .notifications-list {
+      max-height: 110px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .notif-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 11px;
+      padding: 4px 6px;
+      border-radius: 10px;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(31, 41, 55, 0.9);
+    }
+
+    .notif-badge {
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      flex-shrink: 0;
+    }
+
+    .notif-badge.long {
+      background: var(--green-soft);
+      color: #d1fae5;
+      border: 1px solid rgba(14,203,129,1);
+    }
+
+    .notif-badge.short {
+      background: var(--red-soft);
+      color: #fee2e2;
+      border: 1px solid rgba(246,70,93,1);
+    }
+
+    .notif-badge.flat {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      border: 1px solid rgba(243,186,47,0.9);
+    }
+
+    .notif-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .notif-text {
+      color: var(--text-soft);
+    }
+
+    .notif-meta {
+      font-size: 10px;
+      color: #9ca3af;
+    }
+
+    .notif-empty {
+      font-size: 11px;
+      color: #6b7280;
+      padding: 2px 2px;
+    }
+
     .signals-table-wrapper {
       max-height: 230px;
       overflow: hidden auto;
@@ -812,7 +923,7 @@
         <div class="field">
           <label>Setup</label>
           <div class="field-row">
-            <span class="chip">EMAs + ATR · UT · Elliott asistente · Velas japonesas · Sonido</span>
+            <span class="chip">EMAs + ATR · UT · Elliott asistente · Velas + Sonido</span>
           </div>
         </div>
         <button id="connectBtn">
@@ -914,7 +1025,7 @@
         </div>
       </section>
 
-      <!-- RIGHT: historial y stats -->
+      <!-- RIGHT: historial + stats + notificaciones -->
       <section class="card">
         <div class="card-header">
           <div class="card-title">Historial & estadísticas</div>
@@ -941,6 +1052,17 @@
               <div class="stat-label">PnL promedio</div>
               <div id="statAvgPnl" class="stat-value">–</div>
               <div class="stat-sub">% por trade</div>
+            </div>
+          </div>
+
+          <!-- NOTIFICACIONES DE TENDENCIA -->
+          <div class="notifications-panel">
+            <div class="notifications-header">
+              <div class="notifications-title">Notificaciones de tendencia</div>
+              <button id="clearNotifBtn" type="button" class="notif-clear-btn">Limpiar</button>
+            </div>
+            <div id="notificationsList" class="notifications-list">
+              <div class="notif-empty">Sin notificaciones todavía.</div>
             </div>
           </div>
 
@@ -974,7 +1096,7 @@
       </div>
       <div class="footer-section">
         <span class="hint">
-          Guardá este archivo como <strong>scanner-binance-pro-v4-velas.html</strong> y abrilo en el navegador.
+          Guardá este archivo como <strong>scanner-binance-pro-v5-notificaciones.html</strong> y abrilo en el navegador.
         </span>
       </div>
     </footer>
@@ -1019,6 +1141,9 @@
     let signals = []; // { type, price, ema9, ema21, ts, strategy }
     let trades = [];  // { side, entry, exit, pnlPct, tsEntry, tsExit }
     let openPosition = null; // { side, entryPrice, tsEntry }
+
+    // Notifs
+    let notifications = [];
 
     // Audio
     let audioCtx = null;
@@ -1127,6 +1252,9 @@
     const statAvgPnl = document.getElementById("statAvgPnl");
 
     const candleCanvas = document.getElementById("candleCanvas");
+
+    const notificationsList = document.getElementById("notificationsList");
+    const clearNotifBtn = document.getElementById("clearNotifBtn");
 
     // ===== UI STATE =====
     function setConnectionState(state, message) {
@@ -1391,6 +1519,60 @@
       elliottBias = "NEUTRAL";
     }
 
+    // ===== NOTIFICACIONES =====
+    function renderNotifications() {
+      notificationsList.innerHTML = "";
+      if (!notifications.length) {
+        const empty = document.createElement("div");
+        empty.className = "notif-empty";
+        empty.textContent = "Sin notificaciones todavía.";
+        notificationsList.appendChild(empty);
+        return;
+      }
+
+      for (let i = notifications.length - 1; i >= 0; i--) {
+        const n = notifications[i];
+        const item = document.createElement("div");
+        item.className = "notif-item";
+
+        const badge = document.createElement("span");
+        badge.className = "notif-badge " + (n.kind === "LONG" ? "long" : n.kind === "SHORT" ? "short" : "flat");
+        badge.textContent = n.kind;
+
+        const body = document.createElement("div");
+        body.className = "notif-body";
+
+        const text = document.createElement("div");
+        text.className = "notif-text";
+        text.textContent = n.message;
+
+        const meta = document.createElement("div");
+        meta.className = "notif-meta";
+        meta.textContent = `${formatTime(n.ts)} · ${n.symbol} · ${n.interval}`;
+
+        body.appendChild(text);
+        body.appendChild(meta);
+
+        item.appendChild(badge);
+        item.appendChild(body);
+
+        notificationsList.appendChild(item);
+      }
+    }
+
+    function addNotification(kind, message, ts, symbol, interval) {
+      notifications.push({ kind, message, ts, symbol, interval });
+      if (notifications.length > 30) {
+        notifications = notifications.slice(notifications.length - 30);
+      }
+      renderNotifications();
+    }
+
+    function clearNotifications() {
+      notifications = [];
+      renderNotifications();
+    }
+
     function resetState() {
       closes = [];
       ema9 = null;
@@ -1414,6 +1596,8 @@
       resetZigZagState();
 
       candles = [];
+      notifications = [];
+      renderNotifications();
 
       signalsBody.innerHTML = "";
       lastCloseEl.textContent = "– – –";
@@ -1606,27 +1790,29 @@
       updateEntryModeUI();
 
       if (prevEntryMode !== entryMode) {
-        let signalType = null;
-        if (entryMode === "ONLY_LONG") signalType = "BUY";
-        else if (entryMode === "ONLY_SHORT") signalType = "SELL";
-
-        if (signalType) {
-          setSignalBanner(signalType, close, symbol, ts);
-          registerSignal(
-            signalType,
-            close,
-            symbol,
-            ema9,
-            ema21,
-            ts,
-            "ALGO PRO"
-          );
-          playAlert(signalType); // sonido
+        const interval = intervalSelect.value.toUpperCase();
+        // Noti + sonido SOLO cuando pasamos a SOLO_LONG / SOLO_SHORT
+        if (entryMode === "ONLY_LONG") {
+          const msg = "Cambio a modo SOLO LONG (confluencia alcista).";
+          addNotification("LONG", msg, ts, symbol.toUpperCase(), interval);
+          setSignalBanner("BUY", close, symbol, ts);
+          registerSignal("BUY", close, symbol, ema9, ema21, ts, "ALGO PRO");
+          playAlert("BUY");
+        } else if (entryMode === "ONLY_SHORT") {
+          const msg = "Cambio a modo SOLO SHORT (confluencia bajista).";
+          addNotification("SHORT", msg, ts, symbol.toUpperCase(), interval);
+          setSignalBanner("SELL", close, symbol, ts);
+          registerSignal("SELL", close, symbol, ema9, ema21, ts, "ALGO PRO");
+          playAlert("SELL");
         } else {
+          // Volvimos a NO_TRADE -> avisamos, pero sin duplicar sonido
+          const msg = "Salida de confluencia. Modo NO OPERAR.";
+          addNotification("FLAT", msg, ts, symbol.toUpperCase(), interval);
           if (openPosition) {
             const sideExitSignal = openPosition.side === "LONG" ? "SELL" : "BUY";
             handleTradeLogic(sideExitSignal, close, ts);
           }
+          setSignalBanner(null, null, symbol, ts);
         }
       }
     }
@@ -1995,6 +2181,12 @@
     intervalSelect.addEventListener("change", connectStream);
     window.addEventListener("load", connectStream);
     window.addEventListener("resize", drawCandles);
+    clearNotifBtn.addEventListener("click", clearNotifications);
+
+    // Render inicial para que aparezca el mensaje vacío
+    renderNotifications();
   </script>
 </body>
 </html>
+
+
