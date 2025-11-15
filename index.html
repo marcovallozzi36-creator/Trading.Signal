@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>📊 Binance Style – Live Scanner PRO</title>
+  <title>📊 Binance Style – Live Scanner PRO v2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -724,7 +724,7 @@
           <div class="brand-title">
             LIVE<span class="highlight">SCANNER</span> PRO
           </div>
-          <div class="brand-subtitle">BINANCE STYLE · EMAS · ATR · SEÑALES EN VIVO</div>
+          <div class="brand-subtitle">BINANCE STYLE · EMAS · ATR · ELLIOTT ASSIST</div>
         </div>
       </div>
       <div class="header-right">
@@ -765,6 +765,8 @@
               <option value="1m">1m</option>
               <option value="5m">5m</option>
               <option value="15m">15m</option>
+              <option value="1h">1H</option>
+              <option value="1d">1D</option>
             </select>
           </div>
         </div>
@@ -774,7 +776,7 @@
         <div class="field">
           <label>Setup</label>
           <div class="field-row">
-            <span class="chip">EMA 9/21 + ATR (confluencia)</span>
+            <span class="chip">EMA 9/21 + ATR · Elliott informativo</span>
           </div>
         </div>
         <button id="connectBtn">
@@ -829,7 +831,7 @@
               <div class="entry-label">Modo de entrada (planetas alineados)</div>
               <div id="entryStatus" class="entry-status flat">NO OPERAR</div>
               <div id="entrySub" class="entry-sub">
-                Esperando confluencia: EMAs, UT y volatilidad mínima.
+                EMAs, UT y ATR definen el modo. Elliott suma contexto, no manda.
               </div>
             </div>
             <div class="entry-conditions">
@@ -849,6 +851,10 @@
                 <span class="cond-icon">•</span>
                 <span>Volatilidad (ATR)</span>
               </div>
+              <div id="condElliott" class="cond-pill">
+                <span class="cond-icon">•</span>
+                <span>Elliott (impulso/corrección)</span>
+              </div>
             </div>
           </div>
 
@@ -867,7 +873,7 @@
       <section class="card">
         <div class="card-header">
           <div class="card-title">Historial & estadísticas</div>
-          <div class="pill">Confluencia EMAs + ATR · Trades simulados</div>
+          <div class="pill">Confluencia EMAs + ATR · Elliott asistente</div>
         </div>
         <div class="card-body">
           <div class="stats-grid">
@@ -923,7 +929,7 @@
       </div>
       <div class="footer-section">
         <span class="hint">
-          Guardá este archivo como <strong>scanner-binance-pro.html</strong> y abrilo en el navegador.
+          Guardá este archivo como <strong>scanner-binance-pro-v2.html</strong> y abrilo en el navegador.
         </span>
       </div>
     </footer>
@@ -952,6 +958,14 @@
     // "NO_TRADE" | "ONLY_LONG" | "ONLY_SHORT"
     let entryMode = "NO_TRADE";
     let prevEntryMode = "NO_TRADE";
+
+    // ZigZag / Elliott (solo informativo)
+    const ZZ_THRESHOLD = 0.008; // 0.8%
+    let zzLastDir = null;       // "up" | "down" | null
+    let zzLastPrice = null;
+    let zzLastTime = null;
+    let zzPivots = [];          // { type: "H"|"L", price, time }
+    let elliottBias = "NEUTRAL"; // "BULL" | "BEAR" | "NEUTRAL"
 
     // Backtest live
     let signals = []; // { type, price, ema9, ema21, ts, strategy }
@@ -1011,6 +1025,7 @@
     const condUTEl = document.getElementById("condUT");
     const condPriceEl = document.getElementById("condPrice");
     const condAtrEl = document.getElementById("condAtr");
+    const condElliottEl = document.getElementById("condElliott");
 
     const signalTag = document.getElementById("signalTag");
     const signalText = document.getElementById("signalText");
@@ -1092,7 +1107,10 @@
     function setCondPill(el, ok, label) {
       el.classList.remove("ok", "bad");
       el.querySelector("span:nth-child(2)").textContent = label;
-      if (ok === null) return;
+      if (ok === null) {
+        el.querySelector(".cond-icon").textContent = "•";
+        return;
+      }
       if (ok) {
         el.classList.add("ok");
         el.querySelector(".cond-icon").textContent = "✔";
@@ -1107,15 +1125,15 @@
       if (entryMode === "ONLY_LONG") {
         entryStatusEl.textContent = "SOLO LONG";
         entryStatusEl.classList.add("long");
-        entrySubEl.textContent = "Confluencia alcista: solo se consideran entradas en LONG.";
+        entrySubEl.textContent = "Confluencia principal alcista (EMAs + UT + ATR). Elliott sólo acompaña.";
       } else if (entryMode === "ONLY_SHORT") {
         entryStatusEl.textContent = "SOLO SHORT";
         entryStatusEl.classList.add("short");
-        entrySubEl.textContent = "Confluencia bajista: solo se consideran entradas en SHORT.";
+        entrySubEl.textContent = "Confluencia principal bajista (EMAs + UT + ATR). Elliott sólo acompaña.";
       } else {
         entryStatusEl.textContent = "NO OPERAR";
         entryStatusEl.classList.add("flat");
-        entrySubEl.textContent = "Falta confluencia. Mejor esperar, nada de timbear acá.";
+        entrySubEl.textContent = "Falta confluencia dura. Mejor esperar, nada de timbear acá.";
       }
     }
 
@@ -1127,11 +1145,11 @@
       if (type === "BUY") {
         cls = "tag-buy";
         label = "LONG";
-        text = "Señal de entrada LONG por confluencia.";
+        text = "Señal de entrada LONG por confluencia principal.";
       } else if (type === "SELL") {
         cls = "tag-sell";
         label = "SHORT";
-        text = "Señal de entrada SHORT por confluencia.";
+        text = "Señal de entrada SHORT por confluencia principal.";
       }
 
       signalTag.className = "tag " + cls;
@@ -1277,6 +1295,14 @@
       updateStatsUI();
     }
 
+    function resetZigZagState() {
+      zzLastDir = null;
+      zzLastPrice = null;
+      zzLastTime = null;
+      zzPivots = [];
+      elliottBias = "NEUTRAL";
+    }
+
     function resetState() {
       closes = [];
       ema9 = null;
@@ -1297,6 +1323,8 @@
       entryMode = "NO_TRADE";
       prevEntryMode = "NO_TRADE";
 
+      resetZigZagState();
+
       signalsBody.innerHTML = "";
       lastCloseEl.textContent = "– – –";
       lastCandleInfo.textContent = "Esperando datos…";
@@ -1308,6 +1336,7 @@
       setCondPill(condUTEl, null, "Tendencia UT");
       setCondPill(condPriceEl, null, "Precio vs EMAs");
       setCondPill(condAtrEl, null, "Volatilidad (ATR)");
+      setCondPill(condElliottEl, null, "Elliott (impulso/corrección)");
       updateEntryModeUI();
 
       setSignalBanner(null, null, symbolSelect.value, Date.now());
@@ -1315,7 +1344,114 @@
       updateStatsUI();
     }
 
-    // ===== CONFLUENCIA: cálculo de modo y señales =====
+    // ===== ZIGZAG & ELLIOTT (solo info, no manda señales) =====
+    function updateZigZag(close, ts) {
+      if (zzLastPrice === null) {
+        zzLastPrice = close;
+        zzLastTime = ts;
+        return;
+      }
+
+      const change = (close - zzLastPrice) / zzLastPrice;
+
+      if (!zzLastDir) {
+        if (Math.abs(change) >= ZZ_THRESHOLD) {
+          zzLastDir = change > 0 ? "up" : "down";
+        }
+        if (change > 0) {
+          zzLastPrice = close;
+          zzLastTime = ts;
+        } else if (change < 0) {
+          zzLastPrice = close;
+          zzLastTime = ts;
+        }
+        return;
+      }
+
+      if (zzLastDir === "up") {
+        if (close >= zzLastPrice) {
+          zzLastPrice = close;
+          zzLastTime = ts;
+        } else {
+          const drop = (zzLastPrice - close) / zzLastPrice;
+          if (drop >= ZZ_THRESHOLD) {
+            zzPivots.push({ type: "H", price: zzLastPrice, time: zzLastTime });
+            zzLastDir = "down";
+            zzLastPrice = close;
+            zzLastTime = ts;
+          }
+        }
+      } else {
+        if (close <= zzLastPrice) {
+          zzLastPrice = close;
+          zzLastTime = ts;
+        } else {
+          const rise = (close - zzLastPrice) / zzLastPrice;
+          if (rise >= ZZ_THRESHOLD) {
+            zzPivots.push({ type: "L", price: zzLastPrice, time: zzLastTime });
+            zzLastDir = "up";
+            zzLastPrice = close;
+            zzLastTime = ts;
+          }
+        }
+      }
+
+      while (zzPivots.length > 30) zzPivots.shift();
+    }
+
+    function analyzeElliottPattern() {
+      if (zzPivots.length < 5) {
+        elliottBias = "NEUTRAL";
+        setCondPill(condElliottEl, null, "Elliott (pocos pivots)");
+        return;
+      }
+
+      const last5 = zzPivots.slice(-5);
+      let bias = "NEUTRAL";
+      let label = "Elliott sin patrón claro";
+
+      const p0 = last5[0];
+      const p1 = last5[1];
+      const p2 = last5[2];
+      const p3 = last5[3];
+      const p4 = last5[4];
+
+      const bullPattern =
+        p0.type === "L" &&
+        p1.type === "H" &&
+        p2.type === "L" &&
+        p3.type === "H" &&
+        p4.type === "L" &&
+        p2.price > p0.price * 1.02 &&
+        p4.price >= p2.price * 0.9;
+
+      const bearPattern =
+        p0.type === "H" &&
+        p1.type === "L" &&
+        p2.type === "H" &&
+        p3.type === "L" &&
+        p4.type === "H" &&
+        p2.price < p0.price * 0.98 &&
+        p4.price <= p2.price * 1.1;
+
+      if (bullPattern) {
+        bias = "BULL";
+        label = "Elliott: posible impulso alcista (onda impulsiva)";
+      } else if (bearPattern) {
+        bias = "BEAR";
+        label = "Elliott: posible impulso bajista (onda impulsiva)";
+      }
+
+      elliottBias = bias;
+
+      if (bias === "BULL" || bias === "BEAR") {
+        setCondPill(condElliottEl, true, label);
+      } else {
+        setCondPill(condElliottEl, false, "Elliott sin patrón claro (no bloquea entradas)");
+      }
+    }
+
+    // ===== CONFLUENCIA DURA (EMAs + UT + ATR) =====
     function recomputeEntryModeAndSignals(close, symbol, ts) {
       if (
         ema9 === null ||
@@ -1324,7 +1460,6 @@
         utTrend === null ||
         utLine === null
       ) {
-        // Todavía no hay info suficiente
         setCondPill(condEmaEl, null, "EMAs alineadas");
         setCondPill(condUTEl, null, "Tendencia UT");
         setCondPill(condPriceEl, null, "Precio vs EMAs");
@@ -1343,20 +1478,35 @@
       const minAtr = close * ATR_MIN_PCT;
       const enoughVol = atr >= minAtr;
 
-      // Actualizamos pill visual
-      setCondPill(condEmaEl, emaBull || emaBear, "EMAs alineadas (" + (emaBull ? "alcista" : emaBear ? "bajista" : "neutro") + ")");
-      setCondPill(condUTEl, utLong || utShort, "Tendencia UT (" + (utLong ? "LONG" : utShort ? "SHORT" : "flat") + ")");
-      setCondPill(condPriceEl, priceAboveEMAs || priceBelowEMAs, "Precio vs EMAs");
-      setCondPill(condAtrEl, enoughVol, "Volatilidad ATR ≥ " + (ATR_MIN_PCT * 100).toFixed(2) + "%");
+      setCondPill(
+        condEmaEl,
+        emaBull || emaBear,
+        "EMAs alineadas (" + (emaBull ? "alcista" : emaBear ? "bajista" : "neutro") + ")"
+      );
+      setCondPill(
+        condUTEl,
+        utLong || utShort,
+        "Tendencia UT (" + (utLong ? "LONG" : utShort ? "SHORT" : "flat") + ")"
+      );
+      setCondPill(
+        condPriceEl,
+        priceAboveEMAs || priceBelowEMAs,
+        "Precio vs EMAs"
+      );
+      setCondPill(
+        condAtrEl,
+        enoughVol,
+        "Volatilidad ATR ≥ " + (ATR_MIN_PCT * 100).toFixed(2) + "%"
+      );
 
-      const longOK   = emaBull && utLong && priceAboveEMAs && enoughVol;
-      const shortOK  = emaBear && utShort && priceBelowEMAs && enoughVol;
+      const longCore = emaBull && utLong && priceAboveEMAs && enoughVol;
+      const shortCore = emaBear && utShort && priceBelowEMAs && enoughVol;
 
       prevEntryMode = entryMode;
 
-      if (longOK && !shortOK) {
+      if (longCore && !shortCore) {
         entryMode = "ONLY_LONG";
-      } else if (shortOK && !longOK) {
+      } else if (shortCore && !longCore) {
         entryMode = "ONLY_SHORT";
       } else {
         entryMode = "NO_TRADE";
@@ -1364,7 +1514,6 @@
 
       updateEntryModeUI();
 
-      // Señales solo cuando cambia el modo
       if (prevEntryMode !== entryMode) {
         let signalType = null;
         if (entryMode === "ONLY_LONG") signalType = "BUY";
@@ -1382,7 +1531,6 @@
             "ALGO PRO"
           );
         } else {
-          // Cambio hacia NO_TRADE: si había posición abierta, cerramos a precio actual
           if (openPosition) {
             const sideExitSignal = openPosition.side === "LONG" ? "SELL" : "BUY";
             handleTradeLogic(sideExitSignal, close, ts);
@@ -1405,6 +1553,7 @@
         prevClose = null;
         utTrend = null;
         utLine = null;
+        resetZigZagState();
 
         const K_EMA9 = 2 / (9 + 1);
         const K_EMA21 = 2 / (21 + 1);
@@ -1419,7 +1568,7 @@
           closes.push(close);
           if (i === data.length - 1) lastPrice = close;
 
-          // True range y ATR
+          // ATR
           let tr;
           if (prevClose === null) {
             tr = high - low;
@@ -1440,7 +1589,7 @@
           ema9 = computeEMA(ema9, close, K_EMA9);
           ema21 = computeEMA(ema21, close, K_EMA21);
 
-          // UT style trailing stop
+          // UT style
           if (utLine === null) {
             utLine = close;
             utTrend = "FLAT";
@@ -1454,7 +1603,8 @@
             }
           }
 
-          // A partir de cierta cantidad de velas ya podés ir calculando modo
+          updateZigZag(close, closeTime);
+          analyzeElliottPattern();
           if (i > ATR_PERIOD) {
             recomputeEntryModeAndSignals(close, symbol, closeTime);
           }
@@ -1565,7 +1715,7 @@
             lastCandleInfo.textContent =
               `Vela cerrada · ${formatTime(closeTime)} · Vol: ${parseFloat(k.v).toFixed(3)}`;
 
-            // UT style trailing stop
+            // UT
             if (utLine === null) {
               utLine = close;
               utTrend = "FLAT";
@@ -1579,7 +1729,8 @@
               }
             }
 
-            // Confluencia y posibles señales
+            updateZigZag(close, closeTime);
+            analyzeElliottPattern();
             recomputeEntryModeAndSignals(close, symbol, closeTime);
           } else {
             lastCandleInfo.textContent =
