@@ -47,6 +47,92 @@
       padding: 14px;
     }
 
+    /* LOADER OVERLAY */
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, #020617 0, #020309 50%, #000 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.4s ease;
+    }
+
+    .loader-inner {
+      max-width: 320px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .loader-logo {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      margin: 0 auto 18px;
+      background: radial-gradient(circle at 30% 0, #ffce3e 0, #f3ba2f 35%, #c98d0c 70%, #111827 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        0 0 32px rgba(243, 186, 47, 0.9),
+        0 0 70px rgba(14, 203, 129, 0.4);
+      font-size: 38px;
+      color: #05030a;
+      border: 2px solid rgba(250, 250, 250, 0.13);
+    }
+
+    .loader-title {
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-soft);
+      margin-bottom: 6px;
+    }
+
+    .loader-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .loader-bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(15, 23, 42, 0.9);
+      margin-bottom: 6px;
+    }
+
+    .loader-bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #22c55e, #facc15, #f97316, #ef4444);
+      box-shadow: 0 0 16px rgba(249, 115, 22, 0.7);
+      transition: width 0.06s linear;
+    }
+
+    .loader-percent {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .loader-percent span {
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      color: #e5e7eb;
+    }
+
+    .loader-hint {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #6b7280;
+    }
+
     .app-shell {
       width: 100%;
       max-width: 1220px;
@@ -201,7 +287,7 @@
       flex: 0 0 auto;
       border-radius: var(--radius-pill);
       border: 1px solid rgba(55,65,81,0.9);
-      background: radial-gradient(circle at top, #020617, #050714);
+      background: radial-gradient(circle at top, #141823, #050714);
       color: var(--text-soft);
       font-size: 11px;
       text-transform: uppercase;
@@ -311,7 +397,7 @@
       box-shadow: 0 0 14px rgba(243,186,47,0.7);
     }
 
-    /* MAIN LAYOUT (Futuros + Spot usan esto) */
+    /* MAIN LAYOUT */
     .main-layout {
       flex: 1;
       display: grid;
@@ -1028,6 +1114,24 @@
   </style>
 </head>
 <body>
+  <!-- LOADER -->
+  <div id="loaderOverlay" class="loader-overlay">
+    <div class="loader-inner">
+      <div class="loader-logo">₿</div>
+      <div class="loader-title">Crypto Scanner</div>
+      <div class="loader-subtitle">Cargando motores de Futuros &amp; Spot...</div>
+      <div class="loader-bar">
+        <div id="loaderFill" class="loader-bar-fill"></div>
+      </div>
+      <div class="loader-percent">
+        <span id="loaderPercent">0%</span> · preparando confluencias
+      </div>
+      <div class="loader-hint">
+        No es magia, es mercado. Pero ayuda 😉
+      </div>
+    </div>
+  </div>
+
   <div class="app-shell">
     <header>
       <div class="brand">
@@ -1415,7 +1519,7 @@
       </div>
       <div class="footer-section">
         <span class="hint">
-          Guardá este archivo como <strong>scanner-binance-pro-v7-futuros-spot.html</strong> y abrilo en el navegador.
+          Guardá este archivo como <strong>scanner-binance-pro-v7-futuros-spot-loading.html</strong> y abrilo en el navegador.
         </span>
       </div>
     </footer>
@@ -1603,7 +1707,7 @@
     const checkEntryBtn = document.getElementById("checkEntryBtn");
     const entryCheckResultEl = document.getElementById("entryCheckResult");
 
-    // SPOT DOM
+    // SPOT dom
     const spotPriceEl = document.getElementById("spotPrice");
     const spotChange24El = document.getElementById("spotChange24");
     const spotEma200El = document.getElementById("spotEma200");
@@ -1620,6 +1724,11 @@
 
     const spotVolumeTextEl = document.getElementById("spotVolumeText");
     const spotPressureTextEl = document.getElementById("spotPressureText");
+
+    // LOADER DOM
+    const loaderOverlay = document.getElementById("loaderOverlay");
+    const loaderFill = document.getElementById("loaderFill");
+    const loaderPercent = document.getElementById("loaderPercent");
 
     // ===== UI STATE =====
     function setConnectionState(state, message) {
@@ -2901,6 +3010,34 @@
       }
     }
 
+    // ===== LOADER ANIM =====
+    function startLoader() {
+      if (!loaderOverlay || !loaderFill || !loaderPercent) return;
+      let progress = 0;
+      const duration = 3000; // 3 segundos
+      const steps = 100;
+      const intervalMs = duration / steps;
+
+      const timer = setInterval(() => {
+        progress++;
+        if (progress > 100) progress = 100;
+        loaderFill.style.width = progress + "%";
+        loaderPercent.textContent = progress + "%";
+
+        if (progress >= 100) {
+          clearInterval(timer);
+          // Pequeña pausa y fade out
+          setTimeout(() => {
+            loaderOverlay.style.opacity = "0";
+            loaderOverlay.style.pointerEvents = "none";
+            setTimeout(() => {
+              loaderOverlay.style.display = "none";
+            }, 400);
+          }, 200);
+        }
+      }, intervalMs);
+    }
+
     // ===== EVENTOS UI =====
     connectBtn.addEventListener("click", () => {
       initAudio();
@@ -2916,6 +3053,7 @@
     });
 
     window.addEventListener("load", () => {
+      startLoader();
       connectStream();
     });
 
@@ -2934,4 +3072,5 @@
   </script>
 </body>
 </html>
+
 
