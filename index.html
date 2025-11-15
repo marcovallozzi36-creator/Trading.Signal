@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>📊 Binance Style – Live Scanner PRO v2</title>
+  <title>📊 Binance Style – Live Scanner PRO v3 (con sonido)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -724,7 +724,7 @@
           <div class="brand-title">
             LIVE<span class="highlight">SCANNER</span> PRO
           </div>
-          <div class="brand-subtitle">BINANCE STYLE · EMAS · ATR · ELLIOTT ASSIST</div>
+          <div class="brand-subtitle">BINANCE STYLE · EMAS · ATR · ELLIOTT ASSIST · SONIDO</div>
         </div>
       </div>
       <div class="header-right">
@@ -776,7 +776,7 @@
         <div class="field">
           <label>Setup</label>
           <div class="field-row">
-            <span class="chip">EMA 9/21 + ATR · Elliott informativo</span>
+            <span class="chip">EMA 9/21 + ATR · Elliott asistente · Sonido ON</span>
           </div>
         </div>
         <button id="connectBtn">
@@ -831,7 +831,7 @@
               <div class="entry-label">Modo de entrada (planetas alineados)</div>
               <div id="entryStatus" class="entry-status flat">NO OPERAR</div>
               <div id="entrySub" class="entry-sub">
-                EMAs, UT y ATR definen el modo. Elliott suma contexto, no manda.
+                EMAs, UT y ATR definen el modo. Elliott suma contexto. Sonido al entrar LONG/SHORT.
               </div>
             </div>
             <div class="entry-conditions">
@@ -873,7 +873,7 @@
       <section class="card">
         <div class="card-header">
           <div class="card-title">Historial & estadísticas</div>
-          <div class="pill">Confluencia EMAs + ATR · Elliott asistente</div>
+          <div class="pill">Confluencia EMAs + ATR · Elliott asistente · Sonoro</div>
         </div>
         <div class="card-body">
           <div class="stats-grid">
@@ -929,7 +929,7 @@
       </div>
       <div class="footer-section">
         <span class="hint">
-          Guardá este archivo como <strong>scanner-binance-pro-v2.html</strong> y abrilo en el navegador.
+          Guardá este archivo como <strong>scanner-binance-pro-v3-sonido.html</strong> y abrilo en el navegador.
         </span>
       </div>
     </footer>
@@ -971,6 +971,47 @@
     let signals = []; // { type, price, ema9, ema21, ts, strategy }
     let trades = [];  // { side, entry, exit, pnlPct, tsEntry, tsExit }
     let openPosition = null; // { side, entryPrice, tsEntry }
+
+    // Audio
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) {
+          audioCtx = new AC();
+        }
+      }
+    }
+
+    function beepOnce(freq = 880, durationMs = 150, volume = 0.15, startDelayMs = 0) {
+      if (!audioCtx) return;
+      const t0 = audioCtx.currentTime + startDelayMs / 1000;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, t0);
+      gain.gain.linearRampToValueAtTime(volume, t0 + 0.01);
+      gain.gain.linearRampToValueAtTime(0.0001, t0 + durationMs / 1000);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t0);
+      osc.stop(t0 + durationMs / 1000 + 0.05);
+    }
+
+    function playAlert(signalType) {
+      // Llamar sólo cuando cambia a SOLO_LONG / SOLO_SHORT
+      if (!audioCtx) return;
+      if (signalType === "BUY") {
+        // LONG: dos beeps medios
+        beepOnce(950, 140, 0.18, 0);
+        beepOnce(1050, 140, 0.18, 180);
+      } else if (signalType === "SELL") {
+        // SHORT: tres beeps más graves
+        beepOnce(520, 120, 0.18, 0);
+        beepOnce(480, 120, 0.18, 150);
+        beepOnce(440, 140, 0.18, 300);
+      }
+    }
 
     // ===== HELPERS =====
     function formatNumber(num, decimals = 2) {
@@ -1530,6 +1571,8 @@
             ts,
             "ALGO PRO"
           );
+          // 🔊 sonido de alerta
+          playAlert(signalType);
         } else {
           if (openPosition) {
             const sideExitSignal = openPosition.side === "LONG" ? "SELL" : "BUY";
@@ -1741,11 +1784,13 @@
     }
 
     // ===== EVENTOS UI =====
-    connectBtn.addEventListener("click", connectStream);
+    connectBtn.addEventListener("click", () => {
+      initAudio();        // asegura que el contexto de audio se cree tras interacción del usuario
+      connectStream();
+    });
     symbolSelect.addEventListener("change", connectStream);
     intervalSelect.addEventListener("change", connectStream);
     window.addEventListener("load", connectStream);
   </script>
 </body>
 </html>
-
