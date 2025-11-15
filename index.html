@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>📊 Binance Style – Live Scanner PRO v5 (velas + sonido + notificaciones)</title>
+  <title>📊 Binance Style – Live Scanner PRO v6 (velas + sonido + notificaciones + asesor entrada)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -708,6 +708,78 @@
       padding: 2px 2px;
     }
 
+    /* PANEL ASESOR ENTRADA AHORA */
+    .entry-check-panel {
+      margin-bottom: 6px;
+      padding: 7px 8px 7px;
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: radial-gradient(circle at right, rgba(243,186,47,0.08), #020309);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .entry-check-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .entry-check-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+
+    .entry-check-btn {
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(243,186,47,0.8);
+      background: radial-gradient(circle at top left, rgba(243,186,47,0.9), #b48a12);
+      color: #05030a;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 4px 10px;
+      cursor: pointer;
+      box-shadow: 0 0 14px rgba(243,186,47,0.7);
+    }
+
+    .entry-check-btn:hover {
+      filter: brightness(1.05);
+    }
+
+    .entry-check-result {
+      font-size: 11px;
+      color: var(--text-soft);
+      border-radius: 10px;
+      padding: 6px 7px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(31, 41, 55, 0.9);
+    }
+
+    .entry-check-result.ok {
+      border-color: rgba(34,197,94,0.9);
+      box-shadow: 0 0 10px rgba(34,197,94,0.25);
+    }
+
+    .entry-check-result.warn {
+      border-color: rgba(234,179,8,0.9);
+      box-shadow: 0 0 10px rgba(234,179,8,0.25);
+    }
+
+    .entry-check-result.bad {
+      border-color: rgba(239,68,68,0.9);
+      box-shadow: 0 0 10px rgba(239,68,68,0.25);
+    }
+
+    .entry-check-result strong {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
     .signals-table-wrapper {
       max-height: 230px;
       overflow: hidden auto;
@@ -1025,7 +1097,7 @@
         </div>
       </section>
 
-      <!-- RIGHT: historial + stats + notificaciones -->
+      <!-- RIGHT: historial + stats + notificaciones + asesor entrada -->
       <section class="card">
         <div class="card-header">
           <div class="card-title">Historial & estadísticas</div>
@@ -1066,6 +1138,18 @@
             </div>
           </div>
 
+          <!-- ASESOR “¿ENTRO AHORA?” -->
+          <div class="entry-check-panel">
+            <div class="entry-check-header">
+              <div class="entry-check-title">Asistente &ldquo;¿entro ahora?&rdquo;</div>
+              <button id="checkEntryBtn" type="button" class="entry-check-btn">Analizar ahora</button>
+            </div>
+            <div id="entryCheckResult" class="entry-check-result">
+              Tocá <strong>Analizar ahora</strong> para ver si la última señal LONG/SHORT ya está vieja
+              y es mejor NO entrar a precio de mercado, o si todavía tiene algo de sentido mirarla.
+            </div>
+          </div>
+
           <div class="signals-table-wrapper">
             <table>
               <thead>
@@ -1096,7 +1180,7 @@
       </div>
       <div class="footer-section">
         <span class="hint">
-          Guardá este archivo como <strong>scanner-binance-pro-v5-notificaciones.html</strong> y abrilo en el navegador.
+          Guardá este archivo como <strong>scanner-binance-pro-v6-asesor-entrada.html</strong> y abrilo en el navegador.
         </span>
       </div>
     </footer>
@@ -1213,6 +1297,15 @@
       return (price - prevEma) * k + prevEma;
     }
 
+    function humanizeMinutes(min) {
+      const m = Math.round(min);
+      if (m <= 1) return "menos de 1 minuto";
+      if (m < 60) return m + " min";
+      const h = min / 60;
+      if (h < 10) return h.toFixed(1) + " h";
+      return Math.round(h) + " h";
+    }
+
     // ===== DOM =====
     const symbolSelect = document.getElementById("symbolSelect");
     const intervalSelect = document.getElementById("intervalSelect");
@@ -1255,6 +1348,9 @@
 
     const notificationsList = document.getElementById("notificationsList");
     const clearNotifBtn = document.getElementById("clearNotifBtn");
+
+    const checkEntryBtn = document.getElementById("checkEntryBtn");
+    const entryCheckResultEl = document.getElementById("entryCheckResult");
 
     // ===== UI STATE =====
     function setConnectionState(state, message) {
@@ -1616,6 +1712,14 @@
       setSignalBanner(null, null, symbolSelect.value, Date.now());
       updatePositionFooter(symbolSelect.value);
       updateStatsUI();
+
+      // Reset asesor entrada
+      if (entryCheckResultEl) {
+        entryCheckResultEl.className = "entry-check-result";
+        entryCheckResultEl.innerHTML =
+          'Tocá <strong>Analizar ahora</strong> para ver si la última señal LONG/SHORT ya está vieja y es mejor NO entrar a precio de mercado, o si todavía tiene algo de sentido mirarla.';
+      }
+
       drawCandles(); // limpia el canvas
     }
 
@@ -1739,6 +1843,7 @@
         setCondPill(condUTEl, null, "Tendencia UT");
         setCondPill(condPriceEl, null, "Precio vs EMAs");
         setCondPill(condAtrEl, null, "Volatilidad (ATR)");
+        setCondPill(condElliottEl, null, "Elliott (impulso/corrección)");
         entryMode = "NO_TRADE";
         updateEntryModeUI();
         return;
@@ -1815,6 +1920,100 @@
           setSignalBanner(null, null, symbol, ts);
         }
       }
+    }
+
+    // ===== ASESOR “¿ENTRO AHORA?” =====
+    function runEntryNowAdvisor() {
+      if (!entryCheckResultEl) return;
+      const symbol = symbolSelect.value.toUpperCase();
+      const interval = intervalSelect.value;
+
+      entryCheckResultEl.className = "entry-check-result";
+
+      if (!signals.length) {
+        entryCheckResultEl.classList.add("warn");
+        entryCheckResultEl.innerHTML =
+          "No hay ninguna señal registrada todavía en este símbolo/timeframe. " +
+          "Esperá a que el sistema genere una entrada LONG/SHORT con confluencia antes de pensar en entrar a futuros a mercado.";
+        return;
+      }
+
+      if (!lastPrice) {
+        entryCheckResultEl.classList.add("warn");
+        entryCheckResultEl.innerHTML =
+          "Todavía no tengo un precio en tiempo real. Dejá correr unos segundos con el stream conectado antes de evaluar la entrada.";
+        return;
+      }
+
+      const lastSig = signals[signals.length - 1];
+      const now = Date.now();
+      const diffMs = now - lastSig.ts;
+      const minutes = diffMs / 60000;
+
+      const intervalMsMap = {
+        "1m": 60000,
+        "5m": 300000,
+        "15m": 900000,
+        "1h": 3600000,
+        "1d": 86400000
+      };
+      const msPerCandle = intervalMsMap[interval] || 60000;
+      const candlesAgo = diffMs / msPerCandle;
+
+      const side =
+        lastSig.type === "BUY"
+          ? "LONG"
+          : lastSig.type === "SELL"
+          ? "SHORT"
+          : "FLAT";
+
+      let driftPct = 0;
+      if (side === "LONG") {
+        driftPct = ((lastPrice - lastSig.price) / lastSig.price) * 100;
+      } else if (side === "SHORT") {
+        driftPct = ((lastSig.price - lastPrice) / lastSig.price) * 100;
+      }
+
+      const driftAbs = Math.abs(driftPct);
+
+      let mood = "warn";
+      let mainMsg = "";
+
+      const detail =
+        `Última señal: <strong>${side}</strong> hace <strong>${humanizeMinutes(minutes)}</strong>` +
+        ` (${candlesAgo.toFixed(1)} velas) en <strong>${symbol} · ${interval.toUpperCase()}</strong>.<br>` +
+        `Precio señal: <strong>${formatPriceBySymbol(symbol, lastSig.price)}</strong> · ` +
+        `Precio actual: <strong>${formatPriceBySymbol(symbol, lastPrice)}</strong> · ` +
+        `Desvío: <strong>${driftPct.toFixed(2)}%</strong>.`;
+
+      if (entryMode === "NO_TRADE") {
+        mood = "bad";
+        mainMsg =
+          "Ojo fuerte: la confluencia ya no está vigente (modo NO OPERAR). " +
+          "No tiene sentido entrar ahora a precio de mercado basándote en esa señal vieja. Esperá una nueva confluencia.";
+      } else {
+        if (candlesAgo <= 2 && driftAbs <= 0.3) {
+          mood = "ok";
+          mainMsg =
+            "Todavía estás relativamente cerca de la señal. " +
+            "Tiene algo de sentido mirar una entrada, pero siempre con gestión de riesgo y sin perseguir el precio.";
+        } else if (candlesAgo <= 5 && driftAbs <= 1.0) {
+          mood = "warn";
+          mainMsg =
+            "Ya venís un poco tarde. El movimiento puede estar avanzado; " +
+            "pensalo más como trade de continuación que como entrada ideal. Ajustá tamaño de posición.";
+        } else {
+          mood = "bad";
+          mainMsg =
+            "Muy tarde para entrar a mercado usando esa señal. " +
+            "La tendencia puede estar agotada o en plena toma de ganancias. " +
+            "Mejor esperar una nueva señal con los planetas otra vez alineados.";
+        }
+      }
+
+      entryCheckResultEl.classList.add(mood);
+      entryCheckResultEl.innerHTML =
+        `<div>${mainMsg}</div><div style="margin-top:4px;opacity:0.85;">${detail}</div>`;
     }
 
     // ===== GRÁFICO DE VELAS =====
@@ -2182,11 +2381,14 @@
     window.addEventListener("load", connectStream);
     window.addEventListener("resize", drawCandles);
     clearNotifBtn.addEventListener("click", clearNotifications);
+    checkEntryBtn.addEventListener("click", () => {
+      initAudio();
+      runEntryNowAdvisor();
+    });
 
     // Render inicial para que aparezca el mensaje vacío
     renderNotifications();
   </script>
 </body>
 </html>
-
 
