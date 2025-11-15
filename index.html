@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>📊 Binance Style – Live Scanner PRO v6 (velas + sonido + notificaciones + asesor entrada)</title>
+  <title>📊 Binance Style – Live Scanner PRO v7 (Futuros + Spot)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -187,6 +187,37 @@
       box-shadow: 0 0 10px rgba(246,70,93,0.8);
     }
 
+    /* MODE TABS */
+    .mode-tabs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 14px 8px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(to right, rgba(15,23,42,0.9), rgba(5,7,20,0.95));
+    }
+
+    .mode-tab {
+      flex: 0 0 auto;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top, #020617, #050714);
+      color: var(--text-soft);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      padding: 5px 14px;
+      cursor: pointer;
+    }
+
+    .mode-tab.active {
+      border-color: rgba(243,186,47,0.95);
+      background: radial-gradient(circle at top left, rgba(243,186,47,0.9), #b48a12);
+      color: #05030a;
+      box-shadow: 0 0 18px rgba(243,186,47,0.8);
+      font-weight: 600;
+    }
+
     /* TOOLBAR */
     .toolbar {
       padding: 8px 18px 12px;
@@ -280,8 +311,8 @@
       box-shadow: 0 0 14px rgba(243,186,47,0.7);
     }
 
-    /* MAIN GRID */
-    main {
+    /* MAIN LAYOUT (Futuros + Spot usan esto) */
+    .main-layout {
       flex: 1;
       display: grid;
       grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
@@ -290,7 +321,7 @@
     }
 
     @media (max-width: 880px) {
-      main { grid-template-columns: minmax(0, 1fr); }
+      .main-layout { grid-template-columns: minmax(0, 1fr); }
     }
 
     .card {
@@ -354,7 +385,6 @@
       gap: 10px;
     }
 
-    /* GRID METRICS */
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -432,7 +462,7 @@
     .dot.red   { background: var(--red); box-shadow: 0 0 8px rgba(246,70,93,0.9); }
     .dot.gray  { background: #6b7280; }
 
-    /* ENTRY MODE PANEL */
+    /* ENTRY MODE FUTUROS */
     .entry-mode {
       margin-top: 4px;
       padding: 10px 12px;
@@ -558,7 +588,7 @@
       border-radius: 12px;
     }
 
-    /* STATS / TABLE */
+    /* STATS / TABLE FUTUROS */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -597,7 +627,7 @@
     .stat-value.green { color: var(--green); }
     .stat-value.red   { color: var(--red); }
 
-    /* NOTIFICACIONES */
+    /* NOTIFICACIONES FUTUROS */
     .notifications-panel {
       margin-bottom: 6px;
       padding: 6px 8px 6px;
@@ -708,7 +738,7 @@
       padding: 2px 2px;
     }
 
-    /* PANEL ASESOR ENTRADA AHORA */
+    /* PANEL ASESOR FUTUROS */
     .entry-check-panel {
       margin-bottom: 6px;
       padding: 7px 8px 7px;
@@ -851,7 +881,6 @@
       color: var(--text-soft);
     }
 
-    /* SIGNAL BANNER (última señal) */
     .signal-banner {
       margin-top: 4px;
       padding: 8px 10px;
@@ -894,6 +923,70 @@
 
     .signal-detail { display:flex; flex-direction:column; gap:2px; }
     .signal-detail span { font-size:11px; color:var(--text-soft); }
+
+    /* SPOT – Radar */
+    .spot-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .spot-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .range-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: 90px minmax(0, 1fr);
+      gap: 6px;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .range-label {
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .range-bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: #020617;
+      overflow: hidden;
+      border: 1px solid rgba(55,65,81,0.9);
+    }
+
+    .range-bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #22c55e, #facc15, #f97316, #ef4444);
+      width: 0;
+    }
+
+    .spot-zone-text {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .spot-zone-text strong {
+      color: #e5e7eb;
+    }
+
+    .spot-emphasis {
+      font-size: 11px;
+      color: #d1fae5;
+    }
 
     /* FOOTER */
     footer {
@@ -943,7 +1036,7 @@
           <div class="brand-title">
             LIVE<span class="highlight">SCANNER</span> PRO
           </div>
-          <div class="brand-subtitle">BINANCE STYLE · EMAS · ATR · ELLIOTT · VELAS · SONIDO</div>
+          <div class="brand-subtitle">BINANCE STYLE · FUTUROS + SPOT · EMAS · ATR · VELAS</div>
         </div>
       </div>
       <div class="header-right">
@@ -958,6 +1051,13 @@
       </div>
     </header>
 
+    <!-- TABS FUTUROS / SPOT -->
+    <div class="mode-tabs">
+      <button id="tabFutures" class="mode-tab active">Futuros</button>
+      <button id="tabSpot" class="mode-tab">Spot</button>
+    </div>
+
+    <!-- TOOLBAR GLOBAL -->
     <div class="toolbar">
       <div class="toolbar-group">
         <div class="field">
@@ -995,7 +1095,7 @@
         <div class="field">
           <label>Setup</label>
           <div class="field-row">
-            <span class="chip">EMAs + ATR · UT · Elliott asistente · Velas + Sonido</span>
+            <span class="chip">Futuros: EMAs + ATR + UT + Elliott asistente · Spot: EMA200D + rangos</span>
           </div>
         </div>
         <button id="connectBtn">
@@ -1005,11 +1105,12 @@
       </div>
     </div>
 
-    <main>
-      <!-- LEFT: snapshot + modo + chart -->
+    <!-- PANTALLA FUTUROS -->
+    <main id="futuresScreen" class="main-layout">
+      <!-- LEFT -->
       <section class="card">
         <div class="card-header">
-          <div class="card-title">Snapshot de mercado</div>
+          <div class="card-title">Snapshot de mercado (Futuros / scalping)</div>
           <div class="pill" id="symbolLabel">BTCUSDT · 1M</div>
         </div>
         <div class="card-body">
@@ -1044,7 +1145,7 @@
             </div>
           </div>
 
-          <!-- MODO DE ENTRADA -->
+          <!-- MODO ENTRADA -->
           <div class="entry-mode">
             <div class="entry-main">
               <div class="entry-label">Modo de entrada (planetas alineados)</div>
@@ -1097,11 +1198,11 @@
         </div>
       </section>
 
-      <!-- RIGHT: historial + stats + notificaciones + asesor entrada -->
+      <!-- RIGHT -->
       <section class="card">
         <div class="card-header">
-          <div class="card-title">Historial & estadísticas</div>
-          <div class="pill">Confluencia EMAs + ATR · Elliott asistente · Sonoro</div>
+          <div class="card-title">Historial & estadísticas (Futuros)</div>
+          <div class="pill">Confluencia EMAs + ATR · UT · Elliott asistente · Sonoro</div>
         </div>
         <div class="card-body">
           <div class="stats-grid">
@@ -1138,10 +1239,10 @@
             </div>
           </div>
 
-          <!-- ASESOR “¿ENTRO AHORA?” -->
+          <!-- ASESOR FUTUROS “¿ENTRO AHORA?” -->
           <div class="entry-check-panel">
             <div class="entry-check-header">
-              <div class="entry-check-title">Asistente &ldquo;¿entro ahora?&rdquo;</div>
+              <div class="entry-check-title">Asistente FUTUROS &ldquo;¿entro ahora?&rdquo;</div>
               <button id="checkEntryBtn" type="button" class="entry-check-btn">Analizar ahora</button>
             </div>
             <div id="entryCheckResult" class="entry-check-result">
@@ -1169,25 +1270,159 @@
       </section>
     </main>
 
+    <!-- PANTALLA SPOT -->
+    <main id="spotScreen" class="main-layout" style="display:none;">
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">Radar SPOT (contexto grande)</div>
+          <div class="pill" id="spotSymbolLabel">BTCUSDT · Diario</div>
+        </div>
+        <div class="card-body">
+          <div class="spot-grid">
+            <!-- Izquierda: precio + EMA200 + zona -->
+            <div>
+              <div class="metrics-grid">
+                <div class="metric primary">
+                  <div class="metric-label">Precio SPOT (aprox)</div>
+                  <div id="spotPrice" class="metric-value">– – –</div>
+                  <div class="metric-sub">
+                    <span id="spotChange24" class="metric-variation neutral">
+                      <span class="dot gray"></span>
+                      24h: –
+                    </span>
+                  </div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">EMA 200 diaria</div>
+                  <div id="spotEma200" class="metric-value sm mono">– – –</div>
+                  <div class="metric-sub">
+                    Distancia:
+                    <span id="spotDistEma">–</span>
+                  </div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">Zona</div>
+                  <div id="spotZoneLabel" class="metric-value sm">– – –</div>
+                  <div class="metric-sub">
+                    <span id="spotContextText" class="spot-zone-text">
+                      Esperando datos diarios…
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="range-block">
+                <div class="range-row">
+                  <div class="range-label">Rango 90d</div>
+                  <div>
+                    <div class="range-bar">
+                      <div id="spotRange90Bar" class="range-bar-fill"></div>
+                    </div>
+                    <div id="spotRange90Text" class="metric-sub" style="margin-top:2px;">
+                      – Posición en el rango de los últimos 90 días.
+                    </div>
+                  </div>
+                </div>
+                <div class="range-row">
+                  <div class="range-label">Rango 24h</div>
+                  <div>
+                    <div class="range-bar">
+                      <div id="spotRange24Bar" class="range-bar-fill"></div>
+                    </div>
+                    <div id="spotRange24Text" class="metric-sub" style="margin-top:2px;">
+                      – Dentro del rango de las últimas 24h.
+                    </div>
+                  </div>
+                </div>
+                <div class="range-row">
+                  <div class="range-label">Rango 7d</div>
+                  <div>
+                    <div class="range-bar">
+                      <div id="spotRange7Bar" class="range-bar-fill"></div>
+                    </div>
+                    <div id="spotRange7Text" class="metric-sub" style="margin-top:2px;">
+                      – Contexto semanal aproximado.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Derecha: volumen y presión -->
+            <div>
+              <div class="stat-card" style="margin-bottom:8px;">
+                <div class="stat-label">Volumen SPOT 24h</div>
+                <div id="spotVolumeText" class="stat-value">–</div>
+                <div class="stat-sub">
+                  Datos de la API /ticker 24h de Binance.
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Presión compradora / vendedora</div>
+                <div id="spotPressureText" class="spot-emphasis">Esperando datos…</div>
+                <div class="stat-sub">
+                  Basado en el cambio % 24h y el contexto del rango.
+                </div>
+              </div>
+              <div style="margin-top:8px; font-size:11px; color:var(--text-soft);">
+                <strong>Idea de uso SPOT:</strong> mirar si el precio está
+                en zona barata/neutral/cara antes de acumular. No es para
+                scalping, es para contexto de compra/hold.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">Notas rápidas para SPOT</div>
+          <div class="pill">Panorama general, no timba intradía</div>
+        </div>
+        <div class="card-body">
+          <ul style="font-size:11px; color:var(--text-soft); padding-left:16px; display:flex; flex-direction:column; gap:6px;">
+            <li>
+              Si <strong>precio &lt; EMA200D</strong> y está en la parte baja del
+              rango 90d → zona más interesante para acumular con cabeza.
+            </li>
+            <li>
+              Si <strong>precio muy por encima de EMA200D</strong> y
+              cerca del techo del rango 90d → zona de euforia, ojo con
+              comprar el pico.
+            </li>
+            <li>
+              Rango 24h alto pero rango 90d medio → puede ser buena
+              zona para acumular con entradas fraccionadas (DCA).
+            </li>
+            <li>
+              Este panel no abre ni cierra trades: es tu
+              <strong>radar de contexto</strong> para no comprar SPOT
+              a ciegas.
+            </li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
     <footer>
       <div class="footer-section">
         <span class="label">Stream</span>
         <span id="footerStream" class="mono">–</span>
       </div>
       <div class="footer-section">
-        <span class="label">Posición</span>
+        <span class="label">Posición (backtest FUTUROS)</span>
         <span id="footerPosition" class="mono">Sin posición abierta</span>
       </div>
       <div class="footer-section">
         <span class="hint">
-          Guardá este archivo como <strong>scanner-binance-pro-v6-asesor-entrada.html</strong> y abrilo en el navegador.
+          Guardá este archivo como <strong>scanner-binance-pro-v7-futuros-spot.html</strong> y abrilo en el navegador.
         </span>
       </div>
     </footer>
   </div>
 
   <script>
-    // ===== ESTADO GLOBAL =====
+    // ===== ESTADO GLOBAL GENERAL =====
     let socket = null;
     let closes = [];
     let ema9 = null;
@@ -1196,40 +1431,46 @@
     let prevEma9 = null;
     let prevEma21 = null;
 
-    // Candles OHLC para el gráfico
-    let candles = []; // {open, high, low, close, time}
+    // Candles OHLC para el gráfico (Futuros)
+    let candles = [];
     const MAX_CANDLES = 120;
 
     // ATR / UT style
     const ATR_PERIOD = 10;
     const ATR_MULT = 1.5;
-    const ATR_MIN_PCT = 0.0015; // 0.15% del precio
+    const ATR_MIN_PCT = 0.0015; // 0.15%
     let atr = null;
     let prevClose = null;
-    let utTrend = null; // "LONG" | "SHORT" | "FLAT"
+    let utTrend = null;
     let utLine = null;
 
-    // Confluencia: modo de entrada
+    // Confluencia Futuros
     let entryMode = "NO_TRADE";     // "NO_TRADE" | "ONLY_LONG" | "ONLY_SHORT"
     let prevEntryMode = "NO_TRADE";
 
-    // ZigZag / Elliott (solo informativo)
-    const ZZ_THRESHOLD = 0.008; // 0.8%
-    let zzLastDir = null;       // "up" | "down" | null
+    // ZigZag / Elliott (informativo)
+    const ZZ_THRESHOLD = 0.008;
+    let zzLastDir = null;
     let zzLastPrice = null;
     let zzLastTime = null;
-    let zzPivots = [];          // { type: "H"|"L", price, time }
-    let elliottBias = "NEUTRAL"; // "BULL" | "BEAR" | "NEUTRAL"
+    let zzPivots = [];
+    let elliottBias = "NEUTRAL";
 
-    // Backtest live
-    let signals = []; // { type, price, ema9, ema21, ts, strategy }
-    let trades = [];  // { side, entry, exit, pnlPct, tsEntry, tsExit }
-    let openPosition = null; // { side, entryPrice, tsEntry }
+    // Backtest live Futuros
+    let signals = [];
+    let trades = [];
+    let openPosition = null;
 
     // Notifs
     let notifications = [];
 
-    // Audio
+    // Modo actual UI
+    let currentMode = "futures";
+
+    // ===== SPOT CONTEXT =====
+    let spotCtx = null; // { symbol, ema200, min90, max90, min7, max7, lastDailyClose, low24, high24, lastPrice24, change24Percent, quoteVolume24 }
+
+    // ===== Audio FUTUROS =====
     let audioCtx = null;
     function initAudio() {
       if (!audioCtx) {
@@ -1306,14 +1547,24 @@
       return Math.round(h) + " h";
     }
 
+    function clamp(x, a, b) {
+      return Math.min(b, Math.max(a, x));
+    }
+
     // ===== DOM =====
     const symbolSelect = document.getElementById("symbolSelect");
     const intervalSelect = document.getElementById("intervalSelect");
     const connectBtn = document.getElementById("connectBtn");
 
+    const tabFutures = document.getElementById("tabFutures");
+    const tabSpot = document.getElementById("tabSpot");
+    const futuresScreen = document.getElementById("futuresScreen");
+    const spotScreen = document.getElementById("spotScreen");
+
     const statusDot = document.getElementById("statusDot");
     const statusText = document.getElementById("statusText");
     const symbolLabel = document.getElementById("symbolLabel");
+    const spotSymbolLabel = document.getElementById("spotSymbolLabel");
 
     const priceValue = document.getElementById("priceValue");
     const priceChange = document.getElementById("priceChange");
@@ -1351,6 +1602,24 @@
 
     const checkEntryBtn = document.getElementById("checkEntryBtn");
     const entryCheckResultEl = document.getElementById("entryCheckResult");
+
+    // SPOT DOM
+    const spotPriceEl = document.getElementById("spotPrice");
+    const spotChange24El = document.getElementById("spotChange24");
+    const spotEma200El = document.getElementById("spotEma200");
+    const spotDistEmaEl = document.getElementById("spotDistEma");
+    const spotZoneLabelEl = document.getElementById("spotZoneLabel");
+    const spotContextTextEl = document.getElementById("spotContextText");
+
+    const spotRange90BarEl = document.getElementById("spotRange90Bar");
+    const spotRange24BarEl = document.getElementById("spotRange24Bar");
+    const spotRange7BarEl = document.getElementById("spotRange7Bar");
+    const spotRange90TextEl = document.getElementById("spotRange90Text");
+    const spotRange24TextEl = document.getElementById("spotRange24Text");
+    const spotRange7TextEl = document.getElementById("spotRange7Text");
+
+    const spotVolumeTextEl = document.getElementById("spotVolumeText");
+    const spotPressureTextEl = document.getElementById("spotPressureText");
 
     // ===== UI STATE =====
     function setConnectionState(state, message) {
@@ -1418,17 +1687,21 @@
 
     function setCondPill(el, ok, label) {
       el.classList.remove("ok", "bad");
-      el.querySelector("span:nth-child(2)").textContent = label;
+      if (!el) return;
+      const textSpan = el.querySelector("span:nth-child(2)");
+      if (textSpan) textSpan.textContent = label;
+      const iconSpan = el.querySelector(".cond-icon");
+      if (!iconSpan) return;
       if (ok === null) {
-        el.querySelector(".cond-icon").textContent = "•";
+        iconSpan.textContent = "•";
         return;
       }
       if (ok) {
         el.classList.add("ok");
-        el.querySelector(".cond-icon").textContent = "✔";
+        iconSpan.textContent = "✔";
       } else {
         el.classList.add("bad");
-        el.querySelector(".cond-icon").textContent = "✖";
+        iconSpan.textContent = "✖";
       }
     }
 
@@ -1713,17 +1986,20 @@
       updatePositionFooter(symbolSelect.value);
       updateStatsUI();
 
-      // Reset asesor entrada
       if (entryCheckResultEl) {
         entryCheckResultEl.className = "entry-check-result";
         entryCheckResultEl.innerHTML =
           'Tocá <strong>Analizar ahora</strong> para ver si la última señal LONG/SHORT ya está vieja y es mejor NO entrar a precio de mercado, o si todavía tiene algo de sentido mirarla.';
       }
 
-      drawCandles(); // limpia el canvas
+      drawCandles();
+
+      // SPOT context se recalcela al cambiar símbolo/stream
+      spotCtx = null;
+      resetSpotUI();
     }
 
-    // ===== ZIGZAG & ELLIOTT (solo info) =====
+    // ===== ZIGZAG & ELLIOTT =====
     function updateZigZag(close, ts) {
       if (zzLastPrice === null) {
         zzLastPrice = close;
@@ -1830,7 +2106,7 @@
       }
     }
 
-    // ===== CONFLUENCIA DURA (EMAs + UT + ATR) =====
+    // ===== CONFLUENCIA FUTUROS =====
     function recomputeEntryModeAndSignals(close, symbol, ts) {
       if (
         ema9 === null ||
@@ -1896,7 +2172,6 @@
 
       if (prevEntryMode !== entryMode) {
         const interval = intervalSelect.value.toUpperCase();
-        // Noti + sonido SOLO cuando pasamos a SOLO_LONG / SOLO_SHORT
         if (entryMode === "ONLY_LONG") {
           const msg = "Cambio a modo SOLO LONG (confluencia alcista).";
           addNotification("LONG", msg, ts, symbol.toUpperCase(), interval);
@@ -1910,7 +2185,6 @@
           registerSignal("SELL", close, symbol, ema9, ema21, ts, "ALGO PRO");
           playAlert("SELL");
         } else {
-          // Volvimos a NO_TRADE -> avisamos, pero sin duplicar sonido
           const msg = "Salida de confluencia. Modo NO OPERAR.";
           addNotification("FLAT", msg, ts, symbol.toUpperCase(), interval);
           if (openPosition) {
@@ -1922,7 +2196,7 @@
       }
     }
 
-    // ===== ASESOR “¿ENTRO AHORA?” =====
+    // ===== ASESOR FUTUROS “¿ENTRO AHORA?” =====
     function runEntryNowAdvisor() {
       if (!entryCheckResultEl) return;
       const symbol = symbolSelect.value.toUpperCase();
@@ -2016,7 +2290,7 @@
         `<div>${mainMsg}</div><div style="margin-top:4px;opacity:0.85;">${detail}</div>`;
     }
 
-    // ===== GRÁFICO DE VELAS =====
+    // ===== GRÁFICO DE VELAS FUTUROS =====
     function drawCandles() {
       if (!candleCanvas) return;
       const ctx = candleCanvas.getContext("2d");
@@ -2031,7 +2305,6 @@
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Fondo
       ctx.fillStyle = "#050814";
       ctx.fillRect(0, 0, rect.width, rect.height);
 
@@ -2049,7 +2322,6 @@
       const w = rect.width;
       const h = rect.height;
 
-      // Rango de precios
       let minP = Infinity;
       let maxP = -Infinity;
       for (const c of candles) {
@@ -2069,7 +2341,6 @@
         return padTop + (maxP - price) * pxPerPrice;
       }
 
-      // Grid horizontal + labels
       ctx.strokeStyle = "#1f2933";
       ctx.lineWidth = 1;
       ctx.setLineDash([4, 4]);
@@ -2091,7 +2362,6 @@
       }
       ctx.setLineDash([]);
 
-      // Dibujar velas
       const n = candles.length;
       const drawableWidth = w - padLeft - padRight;
       const step = drawableWidth / Math.max(n, 1);
@@ -2109,7 +2379,6 @@
         const isBull = c.close >= c.open;
         const color = isBull ? "#0ecb81" : "#f6465d";
 
-        // mecha
         ctx.strokeStyle = color;
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -2117,7 +2386,6 @@
         ctx.lineTo(xCenter, yLow);
         ctx.stroke();
 
-        // cuerpo
         const bodyTop = Math.min(yOpen, yClose);
         const bodyBottom = Math.max(yOpen, yClose);
         const bodyHeight = Math.max(1, bodyBottom - bodyTop);
@@ -2132,7 +2400,7 @@
       }
     }
 
-    // ===== HISTÓRICO =====
+    // ===== HISTÓRICO FUTUROS =====
     async function loadInitialKlines(symbol, interval) {
       const url =
         `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=80`;
@@ -2165,7 +2433,6 @@
 
           if (i === data.length - 1) lastPrice = close;
 
-          // ATR
           let tr;
           if (prevClose === null) {
             tr = high - low;
@@ -2182,11 +2449,9 @@
           }
           prevClose = close;
 
-          // EMAs
           ema9 = computeEMA(ema9, close, K_EMA9);
           ema21 = computeEMA(ema21, close, K_EMA21);
 
-          // UT style
           if (utLine === null) {
             utLine = close;
             utTrend = "FLAT";
@@ -2207,7 +2472,6 @@
           }
         }
 
-        // Limitar velas
         if (candles.length > MAX_CANDLES) {
           candles = candles.slice(candles.length - MAX_CANDLES);
         }
@@ -2227,6 +2491,244 @@
       }
     }
 
+    // ===== SPOT: RESET UI =====
+    function resetSpotUI() {
+      if (spotSymbolLabel) {
+        const s = symbolSelect.value.toUpperCase();
+        spotSymbolLabel.textContent = `${s} · Diario`;
+      }
+      if (spotPriceEl) spotPriceEl.textContent = "– – –";
+      if (spotChange24El) {
+        spotChange24El.className = "metric-variation neutral";
+        spotChange24El.innerHTML = '<span class="dot gray"></span> 24h: –';
+      }
+      if (spotEma200El) spotEma200El.textContent = "– – –";
+      if (spotDistEmaEl) spotDistEmaEl.textContent = "–";
+      if (spotZoneLabelEl) spotZoneLabelEl.textContent = "– – –";
+      if (spotContextTextEl) spotContextTextEl.textContent = "Esperando datos diarios…";
+
+      if (spotRange90BarEl) spotRange90BarEl.style.width = "0%";
+      if (spotRange24BarEl) spotRange24BarEl.style.width = "0%";
+      if (spotRange7BarEl) spotRange7BarEl.style.width = "0%";
+
+      if (spotRange90TextEl) spotRange90TextEl.textContent = "– Posición en el rango de los últimos 90 días.";
+      if (spotRange24TextEl) spotRange24TextEl.textContent = "– Dentro del rango de las últimas 24h.";
+      if (spotRange7TextEl) spotRange7TextEl.textContent = "– Contexto semanal aproximado.";
+
+      if (spotVolumeTextEl) spotVolumeTextEl.textContent = "–";
+      if (spotPressureTextEl) spotPressureTextEl.textContent = "Esperando datos…";
+    }
+
+    // ===== SPOT: LOAD CONTEXT =====
+    async function loadSpotContext(symbol) {
+      try {
+        resetSpotUI();
+        const dailyUrl = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1d&limit=200`;
+        const tickerUrl = `https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`;
+
+        const [resDaily, resTicker] = await Promise.all([
+          fetch(dailyUrl),
+          fetch(tickerUrl)
+        ]);
+
+        if (!resDaily.ok) throw new Error("Daily HTTP " + resDaily.status);
+        if (!resTicker.ok) throw new Error("Ticker HTTP " + resTicker.status);
+
+        const dailyData = await resDaily.json();
+        const tickerData = await resTicker.json();
+
+        if (!Array.isArray(dailyData) || !dailyData.length) {
+          throw new Error("Sin datos diarios");
+        }
+
+        const closesDaily = dailyData.map(row => parseFloat(row[4]));
+        const timesDaily = dailyData.map(row => row[6]);
+
+        let ema200 = null;
+        const K200 = 2 / (200 + 1);
+        for (let i = 0; i < closesDaily.length; i++) {
+          ema200 = computeEMA(ema200, closesDaily[i], K200);
+        }
+
+        const lastIndex = closesDaily.length - 1;
+        const lastDailyClose = closesDaily[lastIndex];
+
+        const slice90 = closesDaily.slice(-90);
+        const min90 = Math.min(...slice90);
+        const max90 = Math.max(...slice90);
+
+        const slice7 = closesDaily.slice(-7);
+        const min7 = Math.min(...slice7);
+        const max7 = Math.max(...slice7);
+
+        const low24 = parseFloat(tickerData.lowPrice);
+        const high24 = parseFloat(tickerData.highPrice);
+        const lastPrice24 = parseFloat(tickerData.lastPrice);
+        const change24Percent = parseFloat(tickerData.priceChangePercent);
+        const quoteVolume24 = parseFloat(tickerData.quoteVolume || "0");
+
+        spotCtx = {
+          symbol,
+          ema200,
+          min90,
+          max90,
+          min7,
+          max7,
+          lastDailyClose,
+          low24,
+          high24,
+          lastPrice24,
+          change24Percent,
+          quoteVolume24
+        };
+
+        updateSpotUIFromLive();
+      } catch (err) {
+        console.error("Error Spot context:", err);
+        if (spotContextTextEl) {
+          spotContextTextEl.textContent =
+            "Error al cargar contexto SPOT: " + (err && err.message ? err.message : err);
+        }
+      }
+    }
+
+    function updateSpotUIFromLive() {
+      if (!spotCtx) return;
+      const symbol = spotCtx.symbol;
+      const price = lastPrice || spotCtx.lastPrice24;
+
+      if (spotSymbolLabel) {
+        spotSymbolLabel.textContent = `${symbol.toUpperCase()} · Diario`;
+      }
+
+      if (spotPriceEl) {
+        spotPriceEl.textContent = formatPriceBySymbol(symbol, price);
+      }
+
+      if (spotEma200El) {
+        spotEma200El.textContent = formatPriceBySymbol(symbol, spotCtx.ema200);
+      }
+
+      // Distancia a EMA200
+      let distText = "–";
+      let zoneLabel = "NEUTRO";
+      let zoneDesc = "";
+
+      if (spotCtx.ema200 && spotCtx.ema200 > 0) {
+        const dist = ((price - spotCtx.ema200) / spotCtx.ema200) * 100;
+        distText = dist.toFixed(2) + "%";
+
+        const pos90 = (() => {
+          const range = spotCtx.max90 - spotCtx.min90;
+          if (range <= 0) return null;
+          return ((price - spotCtx.min90) / range) * 100;
+        })();
+
+        if (dist < -10 && pos90 !== null && pos90 < 40) {
+          zoneLabel = "ZONA BARATA";
+          zoneDesc = "Precio por debajo de EMA200D y en la parte baja del rango 90d. Contexto más interesante para acumular.";
+        } else if (dist > 15 && pos90 !== null && pos90 > 70) {
+          zoneLabel = "ZONA CARA";
+          zoneDesc = "Precio fuerte por encima de EMA200D y en zona alta del rango 90d. Mucha euforia, ojo con comprar techo.";
+        } else {
+          zoneLabel = "ZONA NEUTRA";
+          zoneDesc = "Ni regalo ni súper caro. Tiene sentido pensar en entradas fraccionadas (DCA) si el proyecto te gusta.";
+        }
+      }
+
+      if (spotDistEmaEl) spotDistEmaEl.textContent = distText;
+      if (spotZoneLabelEl) spotZoneLabelEl.textContent = zoneLabel;
+      if (spotContextTextEl) spotContextTextEl.textContent = zoneDesc || "Esperando más datos para definir zona.";
+
+      // Rangos
+      if (spotRange90BarEl && spotRange90TextEl) {
+        const range = spotCtx.max90 - spotCtx.min90;
+        if (range > 0) {
+          const pos = clamp(((price - spotCtx.min90) / range) * 100, 0, 100);
+          spotRange90BarEl.style.width = pos.toFixed(1) + "%";
+          spotRange90TextEl.textContent =
+            `Ubicado aprox en el ${pos.toFixed(1)}% del rango de los últimos 90 días.`;
+        } else {
+          spotRange90BarEl.style.width = "0%";
+          spotRange90TextEl.textContent =
+            "No se pudo calcular el rango 90d (datos planos).";
+        }
+      }
+
+      if (spotRange24BarEl && spotRange24TextEl) {
+        const range24 = spotCtx.high24 - spotCtx.low24;
+        if (range24 > 0) {
+          const pos24 = clamp(((price - spotCtx.low24) / range24) * 100, 0, 100);
+          spotRange24BarEl.style.width = pos24.toFixed(1) + "%";
+          spotRange24TextEl.textContent =
+            `Hoy estás aprox en el ${pos24.toFixed(1)}% del rango de las últimas 24h.`;
+        } else {
+          spotRange24BarEl.style.width = "0%";
+          spotRange24TextEl.textContent =
+            "No se pudo calcular el rango 24h.";
+        }
+      }
+
+      if (spotRange7BarEl && spotRange7TextEl) {
+        const range7 = spotCtx.max7 - spotCtx.min7;
+        if (range7 > 0) {
+          const pos7 = clamp(((price - spotCtx.min7) / range7) * 100, 0, 100);
+          spotRange7BarEl.style.width = pos7.toFixed(1) + "%";
+          spotRange7TextEl.textContent =
+            `Comparado con los últimos 7 días estás aprox en el ${pos7.toFixed(1)}% del rango semanal.`;
+        } else {
+          spotRange7BarEl.style.width = "0%";
+          spotRange7TextEl.textContent =
+            "No se pudo calcular el rango semanal.";
+        }
+      }
+
+      // Cambio 24h
+      if (spotChange24El) {
+        let cls = "metric-variation neutral";
+        let inner = '<span class="dot gray"></span> 24h: –';
+        if (!Number.isNaN(spotCtx.change24Percent)) {
+          const pct = spotCtx.change24Percent;
+          if (pct > 0.2) {
+            cls = "metric-variation up";
+            inner = `<span class="dot green"></span> 24h: +${pct.toFixed(2)}%`;
+          } else if (pct < -0.2) {
+            cls = "metric-variation down";
+            inner = `<span class="dot red"></span> 24h: ${pct.toFixed(2)}%`;
+          } else {
+            cls = "metric-variation neutral";
+            inner = `<span class="dot gray"></span> 24h: ${pct.toFixed(2)}%`;
+          }
+        }
+        spotChange24El.className = cls;
+        spotChange24El.innerHTML = inner;
+      }
+
+      if (spotVolumeTextEl) {
+        spotVolumeTextEl.textContent =
+          spotCtx.quoteVolume24 > 0
+            ? formatNumber(spotCtx.quoteVolume24, 0) + " (volumen 24h aprox USD)"
+            : "–";
+      }
+
+      if (spotPressureTextEl) {
+        const pct = spotCtx.change24Percent;
+        let txt = "Mixto, sin una dominancia clara hoy.";
+        if (!Number.isNaN(pct)) {
+          if (pct > 3) {
+            txt = "Sesión claramente compradora (precio fuerte al alza en 24h).";
+          } else if (pct > 0.5) {
+            txt = "Ligera presión compradora, contexto saludable.";
+          } else if (pct < -3) {
+            txt = "Sesión muy vendedora, posible capitulación o toma de ganancias fuerte.";
+          } else if (pct < -0.5) {
+            txt = "Presión vendedora moderada, más oferta que demanda en 24h.";
+          }
+        }
+        spotPressureTextEl.textContent = txt;
+      }
+    }
+
     // ===== STREAM EN VIVO =====
     function connectStream() {
       const symbol = symbolSelect.value.toUpperCase();
@@ -2234,6 +2736,7 @@
 
       resetState();
       symbolLabel.textContent = `${symbol} · ${interval.toUpperCase()}`;
+      spotSymbolLabel.textContent = `${symbol} · Diario`;
       footerStream.textContent = `${symbol.toLowerCase()}@kline_${interval}`;
 
       if (socket && socket.readyState === WebSocket.OPEN) {
@@ -2243,6 +2746,9 @@
       setConnectionState("connecting", "Cargando velas iniciales…");
 
       loadInitialKlines(symbol, interval).then(() => {
+        // SPOT context también se carga
+        loadSpotContext(symbol);
+
         const streamName = `${symbol.toLowerCase()}@kline_${interval}`;
         const url = `wss://stream.binance.com/ws/${streamName}`;
 
@@ -2284,12 +2790,15 @@
             setPriceChangeDisplay(closes[0], lastPrice);
           }
 
-          // Actualizar velas para el gráfico
+          // SPOT radar se actualiza con el último precio
+          if (spotCtx && spotCtx.symbol === symbol) {
+            updateSpotUIFromLive();
+          }
+
           if (isFinal) {
             closes.push(close);
             if (closes.length > 400) closes.shift();
 
-            // ATR
             let tr;
             if (prevClose === null) {
               tr = high - low;
@@ -2306,7 +2815,6 @@
             }
             prevClose = close;
 
-            // EMAs
             const K_EMA9 = 2 / (9 + 1);
             const K_EMA21 = 2 / (21 + 1);
 
@@ -2321,7 +2829,6 @@
             lastCandleInfo.textContent =
               `Vela cerrada · ${formatTime(closeTime)} · Vol: ${parseFloat(k.v).toFixed(3)}`;
 
-            // UT
             if (utLine === null) {
               utLine = close;
               utTrend = "FLAT";
@@ -2335,7 +2842,6 @@
               }
             }
 
-            // Cerrar vela en array
             candles.push({ open, high, low, close, time: closeTime });
             if (candles.length > MAX_CANDLES) {
               candles = candles.slice(candles.length - MAX_CANDLES);
@@ -2346,7 +2852,6 @@
             recomputeEntryModeAndSignals(close, symbol, closeTime);
             drawCandles();
           } else {
-            // Vela en curso: actualizamos la última o la creamos
             if (!candles.length) {
               candles.push({ open, high, low, close, time: closeTime });
             } else {
@@ -2371,14 +2876,49 @@
       });
     }
 
+    // ===== MODO UI FUTUROS / SPOT =====
+    function switchMode(mode) {
+      if (mode === currentMode) return;
+      currentMode = mode;
+
+      if (mode === "futures") {
+        tabFutures.classList.add("active");
+        tabSpot.classList.remove("active");
+        futuresScreen.style.display = "grid";
+        spotScreen.style.display = "none";
+      } else {
+        tabSpot.classList.add("active");
+        tabFutures.classList.remove("active");
+        futuresScreen.style.display = "none";
+        spotScreen.style.display = "grid";
+
+        const symbol = symbolSelect.value.toUpperCase();
+        if (!spotCtx || spotCtx.symbol !== symbol) {
+          loadSpotContext(symbol);
+        } else {
+          updateSpotUIFromLive();
+        }
+      }
+    }
+
     // ===== EVENTOS UI =====
     connectBtn.addEventListener("click", () => {
       initAudio();
       connectStream();
     });
-    symbolSelect.addEventListener("change", connectStream);
-    intervalSelect.addEventListener("change", connectStream);
-    window.addEventListener("load", connectStream);
+
+    symbolSelect.addEventListener("change", () => {
+      connectStream();
+    });
+
+    intervalSelect.addEventListener("change", () => {
+      connectStream();
+    });
+
+    window.addEventListener("load", () => {
+      connectStream();
+    });
+
     window.addEventListener("resize", drawCandles);
     clearNotifBtn.addEventListener("click", clearNotifications);
     checkEntryBtn.addEventListener("click", () => {
@@ -2386,7 +2926,10 @@
       runEntryNowAdvisor();
     });
 
-    // Render inicial para que aparezca el mensaje vacío
+    tabFutures.addEventListener("click", () => switchMode("futures"));
+    tabSpot.addEventListener("click", () => switchMode("spot"));
+
+    // Render inicial notificaciones
     renderNotifications();
   </script>
 </body>
