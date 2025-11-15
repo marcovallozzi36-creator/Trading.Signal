@@ -2,24 +2,26 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>📈 Live Trading Analyzer PRO + UT</title>
+  <title>📊 Binance Style – Live Scanner PRO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg: #020617;
-      --bg-soft: #020617;
-      --panel: #020617;
-      --card: #020617;
-      --border: #1f2937;
-      --accent: #22c55e;
-      --accent-soft: rgba(34, 197, 94, 0.15);
-      --accent-alt: #38bdf8;
-      --danger: #ef4444;
-      --danger-soft: rgba(239, 68, 68, 0.15);
-      --muted: #6b7280;
-      --text: #e5e7eb;
-      --text-soft: #9ca3af;
-      --shadow-soft: 0 20px 40px rgba(0, 0, 0, 0.7);
+      --bg: #050714;
+      --bg-soft: #070a1c;
+      --panel: #0b0e1e;
+      --card: #111523;
+      --border: #1f2933;
+      --accent: #f3ba2f;      /* Binance yellow */
+      --accent-soft: rgba(243, 186, 47, 0.14);
+      --accent-strong: #ffce3e;
+      --green: #0ecb81;
+      --green-soft: rgba(14, 203, 129, 0.15);
+      --red: #f6465d;
+      --red-soft: rgba(246, 70, 93, 0.17);
+      --muted: #848e9c;
+      --text: #eaecef;
+      --text-soft: #b7bdc6;
+      --shadow-soft: 0 22px 50px rgba(0, 0, 0, 0.85);
       --radius-lg: 18px;
       --radius-md: 12px;
       --radius-pill: 999px;
@@ -33,7 +35,7 @@
 
     html, body {
       height: 100%;
-      background: radial-gradient(circle at top, #111827 0, #020617 55%, #000 100%);
+      background: radial-gradient(circle at top, #111827 0, #050714 40%, #000 100%);
       color: var(--text);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     }
@@ -42,25 +44,26 @@
       display: flex;
       align-items: stretch;
       justify-content: center;
-      padding: 16px;
+      padding: 14px;
     }
 
     .app-shell {
       width: 100%;
-      max-width: 1200px;
+      max-width: 1220px;
       margin: auto;
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(3, 7, 18, 0.98));
+      background: radial-gradient(circle at top left, #0b0e1e 0, #020308 55%);
       border-radius: 24px;
-      border: 1px solid rgba(148, 163, 184, 0.2);
+      border: 1px solid rgba(51, 65, 85, 0.9);
       box-shadow: var(--shadow-soft);
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
+    /* HEADER */
     header {
-      padding: 16px 20px 8px;
-      border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+      padding: 14px 18px 8px;
+      border-bottom: 1px solid var(--border);
       backdrop-filter: blur(16px);
       display: flex;
       align-items: center;
@@ -75,15 +78,15 @@
     }
 
     .brand-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 16px;
-      background: radial-gradient(circle at 30% 0, #22c55e 0, #16a34a 35%, #4ade80 60%, #22c55e 100%);
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: radial-gradient(circle at 30% 0, var(--accent-strong) 0, var(--accent) 40%, #c98d0c 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 25px rgba(34, 197, 94, 0.7);
-      font-size: 20px;
+      box-shadow: 0 0 25px rgba(243, 186, 47, 0.85);
+      font-size: 18px;
     }
 
     .brand-text {
@@ -94,28 +97,28 @@
 
     .brand-title {
       font-weight: 600;
-      letter-spacing: 0.03em;
-      font-size: 15px;
+      letter-spacing: 0.05em;
+      font-size: 14px;
       display: flex;
       align-items: center;
       gap: 6px;
     }
 
     .brand-title span.highlight {
-      color: #22c55e;
+      color: var(--accent-strong);
     }
 
     .brand-subtitle {
       font-size: 11px;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.16em;
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
       justify-content: flex-end;
     }
@@ -126,18 +129,18 @@
       gap: 6px;
       padding: 4px 10px;
       border-radius: var(--radius-pill);
-      border: 1px solid rgba(34, 197, 94, 0.6);
-      background: linear-gradient(135deg, rgba(22, 163, 74, 0.18), rgba(22, 163, 74, 0.03));
+      border: 1px solid rgba(78, 182, 133, 0.8);
+      background: linear-gradient(135deg, rgba(14,203,129,0.12), rgba(9, 118, 80, 0.1));
       font-size: 11px;
-      color: #bbf7d0;
+      color: #c4f7df;
     }
 
     .dot-pulse {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #22c55e;
-      box-shadow: 0 0 8px rgba(34, 197, 94, 0.9);
+      background: var(--green);
+      box-shadow: 0 0 10px rgba(14, 203, 129, 1);
       position: relative;
     }
 
@@ -146,25 +149,25 @@
       position: absolute;
       inset: -4px;
       border-radius: inherit;
-      border: 1px solid rgba(74, 222, 128, 0.8);
-      animation: ping 1.3s cubic-bezier(0, 0, 0.2, 1) infinite;
+      border: 1px solid rgba(14,203,129,0.8);
+      animation: ping 1.3s cubic-bezier(0,0,0.2,1) infinite;
     }
 
     @keyframes ping {
       0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(1.9); opacity: 0; }
+      100% { transform: scale(2.1); opacity: 0; }
     }
 
     .connection-status {
       font-size: 11px;
       padding: 4px 10px;
       border-radius: var(--radius-pill);
-      border: 1px solid rgba(75, 85, 99, 0.7);
+      border: 1px solid rgba(75, 85, 99, 0.8);
       color: var(--text-soft);
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.22), rgba(15, 23, 42, 0.7));
+      background: radial-gradient(circle at top left, rgba(148,163,184,0.18), rgba(7, 10, 28, 0.9));
     }
 
     .connection-dot {
@@ -175,23 +178,25 @@
     }
 
     .connection-dot.ok {
-      background: #22c55e;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+      background: var(--green);
+      box-shadow: 0 0 10px rgba(14,203,129,0.9);
     }
 
     .connection-dot.off {
-      background: #ef4444;
-      box-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
+      background: var(--red);
+      box-shadow: 0 0 10px rgba(246,70,93,0.8);
     }
 
+    /* TOOLBAR */
     .toolbar {
-      padding: 8px 20px 14px;
-      border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+      padding: 8px 18px 12px;
+      border-bottom: 1px solid var(--border);
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       align-items: center;
       justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(17,24,39,0.75), rgba(5,7,20,0.98));
     }
 
     .toolbar-group {
@@ -211,7 +216,7 @@
 
     .field label {
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.13em;
     }
 
     .field-row {
@@ -224,7 +229,7 @@
       font-family: inherit;
       border-radius: var(--radius-pill);
       border: 1px solid rgba(55, 65, 81, 0.9);
-      background: radial-gradient(circle at top, #0b1120, #020617);
+      background: radial-gradient(circle at top, #141823, #050714);
       color: var(--text);
       font-size: 13px;
       padding: 7px 14px;
@@ -247,40 +252,41 @@
 
     button {
       border-radius: var(--radius-pill);
-      border: 1px solid rgba(34, 197, 94, 0.7);
-      background: radial-gradient(circle at top left, #22c55e, #15803d);
-      color: #ecfdf3;
+      border: 1px solid rgba(243, 186, 47, 0.8);
+      background: radial-gradient(circle at top left, var(--accent-strong), #bb8b10);
+      color: #05030a;
       font-weight: 600;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.06em;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding-inline: 16px;
+      padding-inline: 18px;
       cursor: pointer;
-      box-shadow: 0 0 18px rgba(34, 197, 94, 0.45);
-      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+      box-shadow: 0 0 20px rgba(243, 186, 47, 0.8);
+      text-transform: uppercase;
     }
 
     button span.icon { font-size: 15px; }
 
     button:hover {
+      filter: brightness(1.06);
       transform: translateY(-1px);
-      filter: brightness(1.04);
-      box-shadow: 0 0 22px rgba(34, 197, 94, 0.7);
+      box-shadow: 0 0 26px rgba(243,186,47,1);
     }
 
     button:active {
       transform: translateY(0);
       filter: brightness(0.98);
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+      box-shadow: 0 0 14px rgba(243,186,47,0.7);
     }
 
+    /* MAIN GRID */
     main {
       flex: 1;
       display: grid;
       grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
       gap: 14px;
-      padding: 14px 16px 16px;
+      padding: 14px 14px 16px;
     }
 
     @media (max-width: 880px) {
@@ -288,11 +294,11 @@
     }
 
     .card {
-      background: radial-gradient(circle at top left, rgba(31, 41, 55, 0.9), rgba(15, 23, 42, 0.98));
+      background: radial-gradient(circle at top left, #141823, #050714);
       border-radius: var(--radius-lg);
-      border: 1px solid rgba(31, 41, 55, 0.95);
-      box-shadow: 0 16px 28px rgba(0, 0, 0, 0.7);
-      padding: 14px 14px 12px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.85);
+      padding: 12px 12px 10px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -304,8 +310,10 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at top right, rgba(34, 197, 94, 0.12), transparent 50%);
-      opacity: 0.8;
+      background:
+        radial-gradient(circle at top right, rgba(243,186,47,0.12), transparent 55%),
+        radial-gradient(circle at bottom left, rgba(14,203,129,0.12), transparent 55%);
+      opacity: 0.85;
       pointer-events: none;
     }
 
@@ -346,6 +354,7 @@
       gap: 10px;
     }
 
+    /* GRID METRICS */
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -359,7 +368,7 @@
     .metric {
       padding: 8px 10px;
       border-radius: 14px;
-      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.98));
+      background: radial-gradient(circle at top, #101320, #060816);
       border: 1px solid rgba(55, 65, 81, 0.9);
       display: flex;
       flex-direction: column;
@@ -409,8 +418,8 @@
       gap: 4px;
     }
 
-    .metric-variation.up { color: #4ade80; }
-    .metric-variation.down { color: #fb7185; }
+    .metric-variation.up { color: var(--green); }
+    .metric-variation.down { color: var(--red); }
     .metric-variation.neutral { color: var(--muted); }
 
     .dot {
@@ -419,53 +428,101 @@
       border-radius: 50%;
     }
 
-    .dot.green { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.9); }
-    .dot.red   { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.8); }
+    .dot.green { background: var(--green); box-shadow: 0 0 8px rgba(14,203,129,0.9); }
+    .dot.red   { background: var(--red); box-shadow: 0 0 8px rgba(246,70,93,0.9); }
     .dot.gray  { background: #6b7280; }
 
-    .signal-banner {
+    /* ENTRY MODE PANEL */
+    .entry-mode {
       margin-top: 4px;
-      padding: 8px 10px;
-      border-radius: 14px;
+      padding: 10px 12px;
+      border-radius: 16px;
       border: 1px solid rgba(55, 65, 81, 0.95);
-      background: radial-gradient(circle at left, rgba(34, 197, 94, 0.05), rgba(15, 23, 42, 1));
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      background: radial-gradient(circle at left, rgba(243,186,47,0.12), rgba(5,7,20,1));
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr);
       gap: 10px;
-      font-size: 12px;
+      align-items: center;
     }
 
-    .signal-banner .tag {
-      padding: 4px 10px;
-      border-radius: var(--radius-pill);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.14em;
+    @media (max-width: 780px) {
+      .entry-mode { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .entry-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .entry-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+
+    .entry-status {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
-    .tag-buy {
-      background: var(--accent-soft);
-      border: 1px solid rgba(34, 197, 94, 0.9);
-      color: #bbf7d0;
+    .entry-status.long {
+      color: var(--green);
+      text-shadow: 0 0 12px rgba(14,203,129,0.9);
     }
 
-    .tag-sell {
-      background: var(--danger-soft);
-      border: 1px solid rgba(239, 68, 68, 0.9);
-      color: #fecaca;
+    .entry-status.short {
+      color: var(--red);
+      text-shadow: 0 0 12px rgba(246,70,93,0.95);
     }
 
-    .tag-flat {
-      background: rgba(148, 163, 184, 0.16);
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      color: #e5e7eb;
+    .entry-status.flat {
+      color: var(--accent-strong);
     }
 
-    .signal-detail { display:flex; flex-direction:column; gap:2px; }
-    .signal-detail span { font-size:11px; color:var(--text-soft); }
+    .entry-sub {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
 
+    .entry-conditions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px 10px;
+    }
+
+    .cond-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 4px 7px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(55,65,81,0.9);
+      background: #050814;
+      color: var(--muted);
+    }
+
+    .cond-pill.ok {
+      border-color: rgba(14,203,129,0.9);
+      background: var(--green-soft);
+      color: #d1fae5;
+    }
+
+    .cond-pill.bad {
+      border-color: rgba(246,70,93,0.9);
+      background: var(--red-soft);
+      color: #fee2e2;
+    }
+
+    .cond-icon {
+      font-size: 12px;
+    }
+
+    /* STATS / TABLE */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -481,7 +538,7 @@
       padding: 7px 8px;
       border-radius: 12px;
       border: 1px solid rgba(55, 65, 81, 0.95);
-      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 1));
+      background: radial-gradient(circle at top, #141823, #050714);
       display: flex;
       flex-direction: column;
       gap: 2px;
@@ -501,15 +558,15 @@
     }
 
     .stat-sub { font-size:10px; color:var(--text-soft); }
-    .stat-value.green { color:#4ade80; }
-    .stat-value.red   { color:#fb7185; }
+    .stat-value.green { color: var(--green); }
+    .stat-value.red   { color: var(--red); }
 
     .signals-table-wrapper {
       max-height: 230px;
       overflow: hidden auto;
       border-radius: 12px;
       border: 1px solid rgba(31, 41, 55, 0.9);
-      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 1));
+      background: radial-gradient(circle at top left, #101320, #050714);
     }
 
     table { width:100%; border-collapse:collapse; font-size:11px; }
@@ -518,7 +575,7 @@
       position: sticky;
       top: 0;
       z-index: 2;
-      background: linear-gradient(to bottom, rgba(15,23,42,1), rgba(15,23,42,0.96));
+      background: linear-gradient(to bottom, #0b0f1c, #050714);
     }
 
     th, td {
@@ -536,8 +593,8 @@
       font-size: 10px;
     }
 
-    tbody tr:nth-child(even) { background: rgba(15,23,42,0.9); }
-    tbody tr:hover           { background: rgba(51,65,85,0.8); }
+    tbody tr:nth-child(even) { background: rgba(12,16,32,0.95); }
+    tbody tr:hover           { background: rgba(55,65,81,0.9); }
 
     .badge {
       padding: 2px 8px;
@@ -552,32 +609,84 @@
     }
 
     .badge-buy {
-      background: var(--accent-soft);
-      color: #bbf7d0;
-      border: 1px solid rgba(34, 197, 94, 0.9);
+      background: var(--green-soft);
+      color: #d1fae5;
+      border: 1px solid rgba(14,203,129,1);
     }
 
     .badge-sell {
-      background: var(--danger-soft);
-      color: #fecaca;
-      border: 1px solid rgba(239, 68, 68, 0.9);
+      background: var(--red-soft);
+      color: #fee2e2;
+      border: 1px solid rgba(246,70,93,1);
     }
 
     .badge-flat {
-      background: rgba(148, 163, 184, 0.16);
-      color: #e5e7eb;
-      border: 1px solid rgba(148, 163, 184, 0.8);
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      border: 1px solid rgba(243,186,47,0.9);
     }
 
+    .badge-strat {
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(55,65,81,0.9);
+      color: var(--text-soft);
+    }
+
+    /* SIGNAL BANNER (última señal) */
+    .signal-banner {
+      margin-top: 4px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: radial-gradient(circle at right, rgba(243,186,47,0.1), rgba(5,7,20,1));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .signal-banner .tag {
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .tag-buy {
+      background: var(--green-soft);
+      border: 1px solid rgba(14,203,129,1);
+      color: #d1fae5;
+    }
+
+    .tag-sell {
+      background: var(--red-soft);
+      border: 1px solid rgba(246,70,93,1);
+      color: #fee2e2;
+    }
+
+    .tag-flat {
+      background: var(--accent-soft);
+      border: 1px solid rgba(243,186,47,0.9);
+      color: var(--accent-strong);
+    }
+
+    .signal-detail { display:flex; flex-direction:column; gap:2px; }
+    .signal-detail span { font-size:11px; color:var(--text-soft); }
+
+    /* FOOTER */
     footer {
-      padding: 8px 16px 10px;
-      border-top: 1px solid rgba(31, 41, 55, 0.9);
+      padding: 8px 14px 10px;
+      border-top: 1px solid var(--border);
       font-size: 11px;
       color: var(--muted);
       display: flex;
       justify-content: space-between;
       gap: 8px;
       flex-wrap: wrap;
+      background: radial-gradient(circle at bottom, #020308, #050714);
     }
 
     .footer-section {
@@ -599,10 +708,10 @@
     }
 
     .hint { color:#9ca3af; }
-    .hint strong { color:#e5e7eb; font-weight:600; }
+    .hint strong { color:#eaecef; font-weight:600; }
 
     ::-webkit-scrollbar { width:6px; height:6px; }
-    ::-webkit-scrollbar-track { background:#020617; }
+    ::-webkit-scrollbar-track { background:#020308; }
     ::-webkit-scrollbar-thumb { background:#4b5563; border-radius:999px; }
   </style>
 </head>
@@ -610,12 +719,12 @@
   <div class="app-shell">
     <header>
       <div class="brand">
-        <div class="brand-icon">⚡</div>
+        <div class="brand-icon">₿</div>
         <div class="brand-text">
           <div class="brand-title">
             LIVE<span class="highlight">SCANNER</span> PRO
           </div>
-          <div class="brand-subtitle">EMAS · UT STYLE · BACKTEST EN TIEMPO REAL</div>
+          <div class="brand-subtitle">BINANCE STYLE · EMAS · ATR · SEÑALES EN VIVO</div>
         </div>
       </div>
       <div class="header-right">
@@ -663,9 +772,9 @@
 
       <div class="toolbar-group">
         <div class="field">
-          <label>EMAs / UT</label>
+          <label>Setup</label>
           <div class="field-row">
-            <span class="chip">EMA 9/21 + ATR stop (UT style)</span>
+            <span class="chip">EMA 9/21 + ATR (confluencia)</span>
           </div>
         </div>
         <button id="connectBtn">
@@ -676,10 +785,10 @@
     </div>
 
     <main>
-      <!-- LEFT -->
+      <!-- LEFT: snapshot + modo -->
       <section class="card">
         <div class="card-header">
-          <div class="card-title">SNAPSHOT DE MERCADO</div>
+          <div class="card-title">Snapshot de mercado</div>
           <div class="pill" id="symbolLabel">BTCUSDT · 1M</div>
         </div>
         <div class="card-body">
@@ -714,30 +823,51 @@
             </div>
           </div>
 
-          <!-- UT style metric -->
-          <div class="metric">
-            <div class="metric-label">UT Bot (demo ATR stop)</div>
-            <div id="utTrendLabel" class="metric-value sm">– – –</div>
-            <div class="metric-sub">
-              <span id="utLineText">Línea dinámica: – – –</span>
+          <!-- MODO DE ENTRADA (confluencia) -->
+          <div class="entry-mode">
+            <div class="entry-main">
+              <div class="entry-label">Modo de entrada (planetas alineados)</div>
+              <div id="entryStatus" class="entry-status flat">NO OPERAR</div>
+              <div id="entrySub" class="entry-sub">
+                Esperando confluencia: EMAs, UT y volatilidad mínima.
+              </div>
+            </div>
+            <div class="entry-conditions">
+              <div id="condEma" class="cond-pill">
+                <span class="cond-icon">•</span>
+                <span>EMAs alineadas</span>
+              </div>
+              <div id="condUT" class="cond-pill">
+                <span class="cond-icon">•</span>
+                <span>Tendencia UT</span>
+              </div>
+              <div id="condPrice" class="cond-pill">
+                <span class="cond-icon">•</span>
+                <span>Precio vs EMAs</span>
+              </div>
+              <div id="condAtr" class="cond-pill">
+                <span class="cond-icon">•</span>
+                <span>Volatilidad (ATR)</span>
+              </div>
             </div>
           </div>
 
+          <!-- SIGNALES: última -->
           <div class="signal-banner" id="signalBanner">
             <div id="signalTag" class="tag tag-flat">Sin señal</div>
             <div class="signal-detail">
-              <span id="signalText">Esperando el primer cruce/señal…</span>
+              <span id="signalText">Todavía no se alinearon los planetas para entrar.</span>
               <span id="signalMeta" class="mono">– – –</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- RIGHT -->
+      <!-- RIGHT: historial y stats -->
       <section class="card">
         <div class="card-header">
-          <div class="card-title">HISTORIAL & ESTADÍSTICAS</div>
-          <div class="pill">EMAs · UT style · Trades simulados</div>
+          <div class="card-title">Historial & estadísticas</div>
+          <div class="pill">Confluencia EMAs + ATR · Trades simulados</div>
         </div>
         <div class="card-body">
           <div class="stats-grid">
@@ -757,7 +887,7 @@
               <div class="stat-sub">% trades con PnL &gt; 0</div>
             </div>
             <div class="stat-card">
-              <div class="stat-label">Pnl Promedio</div>
+              <div class="stat-label">PnL promedio</div>
               <div id="statAvgPnl" class="stat-value">–</div>
               <div class="stat-sub">% por trade</div>
             </div>
@@ -793,7 +923,7 @@
       </div>
       <div class="footer-section">
         <span class="hint">
-          Guardá este archivo como <strong>trading-analyzer-pro-ut.html</strong> y abrilo en el navegador.
+          Guardá este archivo como <strong>scanner-binance-pro.html</strong> y abrilo en el navegador.
         </span>
       </div>
     </footer>
@@ -806,21 +936,26 @@
     let ema9 = null;
     let ema21 = null;
     let lastPrice = null;
-    let lastSignal = null;
     let prevEma9 = null;
     let prevEma21 = null;
 
-    // UT style (ATR trailing stop)
+    // ATR / UT style
     const ATR_PERIOD = 10;
     const ATR_MULT = 1.5;
+    const ATR_MIN_PCT = 0.0015; // 0.15% del precio
     let atr = null;
     let prevClose = null;
-    let utTrend = null;     // "LONG" | "SHORT" | "FLAT"
+    let utTrend = null; // "LONG" | "SHORT" | "FLAT"
     let utLine = null;
 
+    // Confluencia: modo de entrada
+    // "NO_TRADE" | "ONLY_LONG" | "ONLY_SHORT"
+    let entryMode = "NO_TRADE";
+    let prevEntryMode = "NO_TRADE";
+
     // Backtest live
-    let signals = [];       // { type, price, ema9, ema21, ts, strategy }
-    let trades = [];        // { side, entry, exit, pnlPct, tsEntry, tsExit }
+    let signals = []; // { type, price, ema9, ema21, ts, strategy }
+    let trades = [];  // { side, entry, exit, pnlPct, tsEntry, tsExit }
     let openPosition = null; // { side, entryPrice, tsEntry }
 
     // ===== HELPERS =====
@@ -870,8 +1005,12 @@
     const ema21Value = document.getElementById("ema21Value");
     const emaState = document.getElementById("emaState");
 
-    const utTrendLabel = document.getElementById("utTrendLabel");
-    const utLineText = document.getElementById("utLineText");
+    const entryStatusEl = document.getElementById("entryStatus");
+    const entrySubEl = document.getElementById("entrySub");
+    const condEmaEl = document.getElementById("condEma");
+    const condUTEl = document.getElementById("condUT");
+    const condPriceEl = document.getElementById("condPrice");
+    const condAtrEl = document.getElementById("condAtr");
 
     const signalTag = document.getElementById("signalTag");
     const signalText = document.getElementById("signalText");
@@ -940,45 +1079,59 @@
         emaState.textContent = "Esperando más velas para estabilizar EMAs…";
         return;
       }
+
       if (ema9 > ema21) {
-        emaState.textContent = "Sesgo alcista (EMA 9 por encima de EMA 21)";
+        emaState.textContent = "Sesgo EMA alcista (9 > 21)";
       } else if (ema9 < ema21) {
-        emaState.textContent = "Sesgo bajista (EMA 9 por debajo de EMA 21)";
+        emaState.textContent = "Sesgo EMA bajista (9 < 21)";
       } else {
-        emaState.textContent = "EMAs prácticamente iguales (zona de equilibrio)";
+        emaState.textContent = "EMAs casi iguales (equilibrio)";
       }
     }
 
-    function updateUtDisplay(symbol) {
-      if (!utTrend || utLine === null || atr === null) {
-        utTrendLabel.textContent = "Sin tendencia definida";
-        utLineText.textContent = "Línea dinámica: – – –";
-        return;
-      }
-      if (utTrend === "LONG") {
-        utTrendLabel.textContent = "UT: LONG (sesgo alcista)";
-      } else if (utTrend === "SHORT") {
-        utTrendLabel.textContent = "UT: SHORT (sesgo bajista)";
+    function setCondPill(el, ok, label) {
+      el.classList.remove("ok", "bad");
+      el.querySelector("span:nth-child(2)").textContent = label;
+      if (ok === null) return;
+      if (ok) {
+        el.classList.add("ok");
+        el.querySelector(".cond-icon").textContent = "✔";
       } else {
-        utTrendLabel.textContent = "UT: FLAT";
+        el.classList.add("bad");
+        el.querySelector(".cond-icon").textContent = "✖";
       }
-      utLineText.textContent =
-        "Línea dinámica: " + formatPriceBySymbol(symbol, utLine);
+    }
+
+    function updateEntryModeUI() {
+      entryStatusEl.classList.remove("long", "short", "flat");
+      if (entryMode === "ONLY_LONG") {
+        entryStatusEl.textContent = "SOLO LONG";
+        entryStatusEl.classList.add("long");
+        entrySubEl.textContent = "Confluencia alcista: solo se consideran entradas en LONG.";
+      } else if (entryMode === "ONLY_SHORT") {
+        entryStatusEl.textContent = "SOLO SHORT";
+        entryStatusEl.classList.add("short");
+        entrySubEl.textContent = "Confluencia bajista: solo se consideran entradas en SHORT.";
+      } else {
+        entryStatusEl.textContent = "NO OPERAR";
+        entryStatusEl.classList.add("flat");
+        entrySubEl.textContent = "Falta confluencia. Mejor esperar, nada de timbear acá.";
+      }
     }
 
     function setSignalBanner(type, price, symbol, ts) {
       let cls = "tag-flat";
       let label = "Sin señal";
-      let text = "Esperando el primer cruce/señal…";
+      let text = "Todavía no se alinearon los planetas para entrar.";
 
       if (type === "BUY") {
         cls = "tag-buy";
         label = "LONG";
-        text = "Señal alcista (cambio de sesgo).";
+        text = "Señal de entrada LONG por confluencia.";
       } else if (type === "SELL") {
         cls = "tag-sell";
         label = "SHORT";
-        text = "Señal bajista (cambio de sesgo).";
+        text = "Señal de entrada SHORT por confluencia.";
       }
 
       signalTag.className = "tag " + cls;
@@ -1017,7 +1170,10 @@
       tr.appendChild(tdType);
 
       const tdStrat = document.createElement("td");
-      tdStrat.textContent = strategy || "EMA";
+      const stratBadge = document.createElement("span");
+      stratBadge.classList.add("badge", "badge-strat");
+      stratBadge.textContent = strategy || "ALGO PRO";
+      tdStrat.appendChild(stratBadge);
       tr.appendChild(tdStrat);
 
       const tdPrice = document.createElement("td");
@@ -1033,7 +1189,7 @@
       tr.appendChild(tdEma21);
 
       signalsBody.insertBefore(tr, signalsBody.firstChild);
-      while (signalsBody.rows.length > 50) {
+      while (signalsBody.rows.length > 60) {
         signalsBody.deleteRow(signalsBody.rows.length - 1);
       }
     }
@@ -1128,7 +1284,6 @@
       prevEma9 = null;
       prevEma21 = null;
       lastPrice = null;
-      lastSignal = null;
 
       atr = null;
       prevClose = null;
@@ -1139,42 +1294,132 @@
       trades = [];
       openPosition = null;
 
+      entryMode = "NO_TRADE";
+      prevEntryMode = "NO_TRADE";
+
       signalsBody.innerHTML = "";
       lastCloseEl.textContent = "– – –";
       lastCandleInfo.textContent = "Esperando datos…";
       setPriceDisplay(symbolSelect.value, null);
       setPriceChangeDisplay(null, null);
       updateEmaDisplay(symbolSelect.value);
-      updateUtDisplay(symbolSelect.value);
+
+      setCondPill(condEmaEl, null, "EMAs alineadas");
+      setCondPill(condUTEl, null, "Tendencia UT");
+      setCondPill(condPriceEl, null, "Precio vs EMAs");
+      setCondPill(condAtrEl, null, "Volatilidad (ATR)");
+      updateEntryModeUI();
+
       setSignalBanner(null, null, symbolSelect.value, Date.now());
       updatePositionFooter(symbolSelect.value);
       updateStatsUI();
     }
 
-    // ===== DATA: HISTÓRICO =====
+    // ===== CONFLUENCIA: cálculo de modo y señales =====
+    function recomputeEntryModeAndSignals(close, symbol, ts) {
+      if (
+        ema9 === null ||
+        ema21 === null ||
+        atr === null ||
+        utTrend === null ||
+        utLine === null
+      ) {
+        // Todavía no hay info suficiente
+        setCondPill(condEmaEl, null, "EMAs alineadas");
+        setCondPill(condUTEl, null, "Tendencia UT");
+        setCondPill(condPriceEl, null, "Precio vs EMAs");
+        setCondPill(condAtrEl, null, "Volatilidad (ATR)");
+        entryMode = "NO_TRADE";
+        updateEntryModeUI();
+        return;
+      }
+
+      const emaBull = ema9 > ema21;
+      const emaBear = ema9 < ema21;
+      const utLong = utTrend === "LONG";
+      const utShort = utTrend === "SHORT";
+      const priceAboveEMAs = close > ema9 && close > ema21;
+      const priceBelowEMAs = close < ema9 && close < ema21;
+      const minAtr = close * ATR_MIN_PCT;
+      const enoughVol = atr >= minAtr;
+
+      // Actualizamos pill visual
+      setCondPill(condEmaEl, emaBull || emaBear, "EMAs alineadas (" + (emaBull ? "alcista" : emaBear ? "bajista" : "neutro") + ")");
+      setCondPill(condUTEl, utLong || utShort, "Tendencia UT (" + (utLong ? "LONG" : utShort ? "SHORT" : "flat") + ")");
+      setCondPill(condPriceEl, priceAboveEMAs || priceBelowEMAs, "Precio vs EMAs");
+      setCondPill(condAtrEl, enoughVol, "Volatilidad ATR ≥ " + (ATR_MIN_PCT * 100).toFixed(2) + "%");
+
+      const longOK   = emaBull && utLong && priceAboveEMAs && enoughVol;
+      const shortOK  = emaBear && utShort && priceBelowEMAs && enoughVol;
+
+      prevEntryMode = entryMode;
+
+      if (longOK && !shortOK) {
+        entryMode = "ONLY_LONG";
+      } else if (shortOK && !longOK) {
+        entryMode = "ONLY_SHORT";
+      } else {
+        entryMode = "NO_TRADE";
+      }
+
+      updateEntryModeUI();
+
+      // Señales solo cuando cambia el modo
+      if (prevEntryMode !== entryMode) {
+        let signalType = null;
+        if (entryMode === "ONLY_LONG") signalType = "BUY";
+        else if (entryMode === "ONLY_SHORT") signalType = "SELL";
+
+        if (signalType) {
+          setSignalBanner(signalType, close, symbol, ts);
+          registerSignal(
+            signalType,
+            close,
+            symbol,
+            ema9,
+            ema21,
+            ts,
+            "ALGO PRO"
+          );
+        } else {
+          // Cambio hacia NO_TRADE: si había posición abierta, cerramos a precio actual
+          if (openPosition) {
+            const sideExitSignal = openPosition.side === "LONG" ? "SELL" : "BUY";
+            handleTradeLogic(sideExitSignal, close, ts);
+          }
+        }
+      }
+    }
+
+    // ===== HISTÓRICO =====
     async function loadInitialKlines(symbol, interval) {
       const url =
-        `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=60`;
+        `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=80`;
       try {
         const res = await fetch(url);
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
+
         closes = [];
         atr = null;
         prevClose = null;
         utTrend = null;
         utLine = null;
 
+        const K_EMA9 = 2 / (9 + 1);
+        const K_EMA21 = 2 / (21 + 1);
+
         for (let i = 0; i < data.length; i++) {
           const row = data[i];
           const high = parseFloat(row[2]);
           const low = parseFloat(row[3]);
           const close = parseFloat(row[4]);
+          const closeTime = row[6];
 
           closes.push(close);
           if (i === data.length - 1) lastPrice = close;
 
-          // ATR
+          // True range y ATR
           let tr;
           if (prevClose === null) {
             tr = high - low;
@@ -1192,12 +1437,10 @@
           prevClose = close;
 
           // EMAs
-          const K_EMA9 = 2 / (9 + 1);
-          const K_EMA21 = 2 / (21 + 1);
           ema9 = computeEMA(ema9, close, K_EMA9);
           ema21 = computeEMA(ema21, close, K_EMA21);
 
-          // UT style stop
+          // UT style trailing stop
           if (utLine === null) {
             utLine = close;
             utTrend = "FLAT";
@@ -1210,12 +1453,16 @@
               utLine = Math.min(utLine, close + ATR_MULT * atr);
             }
           }
+
+          // A partir de cierta cantidad de velas ya podés ir calculando modo
+          if (i > ATR_PERIOD) {
+            recomputeEntryModeAndSignals(close, symbol, closeTime);
+          }
         }
 
         setPriceDisplay(symbol, lastPrice);
         setPriceChangeDisplay(closes[0], lastPrice);
         updateEmaDisplay(symbol);
-        updateUtDisplay(symbol);
         lastCloseEl.textContent = formatPriceBySymbol(symbol, lastPrice);
         lastCandleInfo.textContent =
           `Histórico precargado (${closes.length} velas)`;
@@ -1226,7 +1473,7 @@
       }
     }
 
-    // ===== DATA: STREAM =====
+    // ===== STREAM EN VIVO =====
     function connectStream() {
       const symbol = symbolSelect.value.toUpperCase();
       const interval = intervalSelect.value;
@@ -1283,7 +1530,10 @@
           }
 
           if (isFinal) {
-            // Actualizamos ATR
+            closes.push(close);
+            if (closes.length > 400) closes.shift();
+
+            // ATR
             let tr;
             if (prevClose === null) {
               tr = high - low;
@@ -1300,9 +1550,7 @@
             }
             prevClose = close;
 
-            closes.push(close);
-            if (closes.length > 300) closes.shift();
-
+            // EMAs
             const K_EMA9 = 2 / (9 + 1);
             const K_EMA21 = 2 / (21 + 1);
 
@@ -1311,7 +1559,6 @@
 
             ema9 = computeEMA(ema9, close, K_EMA9);
             ema21 = computeEMA(ema21, close, K_EMA21);
-
             updateEmaDisplay(symbol);
 
             lastCloseEl.textContent = formatPriceBySymbol(symbol, close);
@@ -1319,7 +1566,6 @@
               `Vela cerrada · ${formatTime(closeTime)} · Vol: ${parseFloat(k.v).toFixed(3)}`;
 
             // UT style trailing stop
-            let prevUtTrend = utTrend;
             if (utLine === null) {
               utLine = close;
               utTrend = "FLAT";
@@ -1332,34 +1578,9 @@
                 utLine = Math.min(utLine, close + ATR_MULT * atr);
               }
             }
-            updateUtDisplay(symbol);
 
-            // ---- Señales EMA cross ----
-            if (
-              prevEma9 !== null &&
-              prevEma21 !== null &&
-              ema9 !== null &&
-              ema21 !== null
-            ) {
-              let newSignal = null;
-              if (prevEma9 <= prevEma21 && ema9 > ema21) {
-                newSignal = "BUY";
-              } else if (prevEma9 >= prevEma21 && ema9 < ema21) {
-                newSignal = "SELL";
-              }
-              if (newSignal && newSignal !== lastSignal) {
-                lastSignal = newSignal;
-                setSignalBanner(newSignal, close, symbol, closeTime);
-                registerSignal(newSignal, close, symbol, ema9, ema21, closeTime, "EMA");
-              }
-            }
-
-            // ---- Señales UT style (cambio de tendencia) ----
-            if (prevUtTrend && utTrend && prevUtTrend !== utTrend) {
-              const utSignal = utTrend === "LONG" ? "BUY" : "SELL";
-              setSignalBanner(utSignal, close, symbol, closeTime);
-              registerSignal(utSignal, close, symbol, ema9, ema21, closeTime, "UT");
-            }
+            // Confluencia y posibles señales
+            recomputeEntryModeAndSignals(close, symbol, closeTime);
           } else {
             lastCandleInfo.textContent =
               `Vela en curso · ${formatTime(openTime)} → ${formatTime(closeTime)}`;
@@ -1376,3 +1597,4 @@
   </script>
 </body>
 </html>
+
