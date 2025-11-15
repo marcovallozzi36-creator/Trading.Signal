@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>📊 Binance Style – Live Scanner PRO v3 (con sonido)</title>
+  <title>📊 Binance Style – Live Scanner PRO v4 (velas + sonido)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -11,7 +11,7 @@
       --panel: #0b0e1e;
       --card: #111523;
       --border: #1f2933;
-      --accent: #f3ba2f;      /* Binance yellow */
+      --accent: #f3ba2f;
       --accent-soft: rgba(243, 186, 47, 0.14);
       --accent-strong: #ffce3e;
       --green: #0ecb81;
@@ -522,6 +522,42 @@
       font-size: 12px;
     }
 
+    /* CANDLE CHART */
+    .chart-wrapper {
+      margin-top: 6px;
+      border-radius: 16px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: radial-gradient(circle at top, #050814, #020309);
+      padding: 4px 6px 2px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+      padding-inline: 4px;
+    }
+
+    .chart-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+
+    .chart-sub {
+      font-size: 10px;
+      color: var(--text-soft);
+    }
+
+    #candleCanvas {
+      width: 100%;
+      height: 210px;
+      display: block;
+      border-radius: 12px;
+    }
+
     /* STATS / TABLE */
     .stats-grid {
       display: grid;
@@ -724,7 +760,7 @@
           <div class="brand-title">
             LIVE<span class="highlight">SCANNER</span> PRO
           </div>
-          <div class="brand-subtitle">BINANCE STYLE · EMAS · ATR · ELLIOTT ASSIST · SONIDO</div>
+          <div class="brand-subtitle">BINANCE STYLE · EMAS · ATR · ELLIOTT · VELAS · SONIDO</div>
         </div>
       </div>
       <div class="header-right">
@@ -776,7 +812,7 @@
         <div class="field">
           <label>Setup</label>
           <div class="field-row">
-            <span class="chip">EMA 9/21 + ATR · Elliott asistente · Sonido ON</span>
+            <span class="chip">EMAs + ATR · UT · Elliott asistente · Velas japonesas · Sonido</span>
           </div>
         </div>
         <button id="connectBtn">
@@ -787,7 +823,7 @@
     </div>
 
     <main>
-      <!-- LEFT: snapshot + modo -->
+      <!-- LEFT: snapshot + modo + chart -->
       <section class="card">
         <div class="card-header">
           <div class="card-title">Snapshot de mercado</div>
@@ -825,7 +861,7 @@
             </div>
           </div>
 
-          <!-- MODO DE ENTRADA (confluencia) -->
+          <!-- MODO DE ENTRADA -->
           <div class="entry-mode">
             <div class="entry-main">
               <div class="entry-label">Modo de entrada (planetas alineados)</div>
@@ -858,13 +894,22 @@
             </div>
           </div>
 
-          <!-- SIGNALES: última -->
+          <!-- ÚLTIMA SEÑAL -->
           <div class="signal-banner" id="signalBanner">
             <div id="signalTag" class="tag tag-flat">Sin señal</div>
             <div class="signal-detail">
               <span id="signalText">Todavía no se alinearon los planetas para entrar.</span>
               <span id="signalMeta" class="mono">– – –</span>
             </div>
+          </div>
+
+          <!-- GRÁFICO DE VELAS -->
+          <div class="chart-wrapper">
+            <div class="chart-header">
+              <div class="chart-title">Gráfico de velas japonesas</div>
+              <div class="chart-sub">Datos en vivo desde Binance (OHLC)</div>
+            </div>
+            <canvas id="candleCanvas"></canvas>
           </div>
         </div>
       </section>
@@ -929,7 +974,7 @@
       </div>
       <div class="footer-section">
         <span class="hint">
-          Guardá este archivo como <strong>scanner-binance-pro-v3-sonido.html</strong> y abrilo en el navegador.
+          Guardá este archivo como <strong>scanner-binance-pro-v4-velas.html</strong> y abrilo en el navegador.
         </span>
       </div>
     </footer>
@@ -945,6 +990,10 @@
     let prevEma9 = null;
     let prevEma21 = null;
 
+    // Candles OHLC para el gráfico
+    let candles = []; // {open, high, low, close, time}
+    const MAX_CANDLES = 120;
+
     // ATR / UT style
     const ATR_PERIOD = 10;
     const ATR_MULT = 1.5;
@@ -955,8 +1004,7 @@
     let utLine = null;
 
     // Confluencia: modo de entrada
-    // "NO_TRADE" | "ONLY_LONG" | "ONLY_SHORT"
-    let entryMode = "NO_TRADE";
+    let entryMode = "NO_TRADE";     // "NO_TRADE" | "ONLY_LONG" | "ONLY_SHORT"
     let prevEntryMode = "NO_TRADE";
 
     // ZigZag / Elliott (solo informativo)
@@ -999,14 +1047,11 @@
     }
 
     function playAlert(signalType) {
-      // Llamar sólo cuando cambia a SOLO_LONG / SOLO_SHORT
       if (!audioCtx) return;
       if (signalType === "BUY") {
-        // LONG: dos beeps medios
         beepOnce(950, 140, 0.18, 0);
         beepOnce(1050, 140, 0.18, 180);
       } else if (signalType === "SELL") {
-        // SHORT: tres beeps más graves
         beepOnce(520, 120, 0.18, 0);
         beepOnce(480, 120, 0.18, 150);
         beepOnce(440, 140, 0.18, 300);
@@ -1080,6 +1125,8 @@
     const statTrades = document.getElementById("statTrades");
     const statWinrate = document.getElementById("statWinrate");
     const statAvgPnl = document.getElementById("statAvgPnl");
+
+    const candleCanvas = document.getElementById("candleCanvas");
 
     // ===== UI STATE =====
     function setConnectionState(state, message) {
@@ -1366,6 +1413,8 @@
 
       resetZigZagState();
 
+      candles = [];
+
       signalsBody.innerHTML = "";
       lastCloseEl.textContent = "– – –";
       lastCandleInfo.textContent = "Esperando datos…";
@@ -1383,9 +1432,10 @@
       setSignalBanner(null, null, symbolSelect.value, Date.now());
       updatePositionFooter(symbolSelect.value);
       updateStatsUI();
+      drawCandles(); // limpia el canvas
     }
 
-    // ===== ZIGZAG & ELLIOTT (solo info, no manda señales) =====
+    // ===== ZIGZAG & ELLIOTT (solo info) =====
     function updateZigZag(close, ts) {
       if (zzLastPrice === null) {
         zzLastPrice = close;
@@ -1571,14 +1621,129 @@
             ts,
             "ALGO PRO"
           );
-          // 🔊 sonido de alerta
-          playAlert(signalType);
+          playAlert(signalType); // sonido
         } else {
           if (openPosition) {
             const sideExitSignal = openPosition.side === "LONG" ? "SELL" : "BUY";
             handleTradeLogic(sideExitSignal, close, ts);
           }
         }
+      }
+    }
+
+    // ===== GRÁFICO DE VELAS =====
+    function drawCandles() {
+      if (!candleCanvas) return;
+      const ctx = candleCanvas.getContext("2d");
+      if (!ctx) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      const rect = candleCanvas.getBoundingClientRect();
+      const width = rect.width * dpr;
+      const height = rect.height * dpr;
+      candleCanvas.width = width;
+      candleCanvas.height = height;
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      // Fondo
+      ctx.fillStyle = "#050814";
+      ctx.fillRect(0, 0, rect.width, rect.height);
+
+      if (!candles.length) {
+        ctx.fillStyle = "#6b7280";
+        ctx.font = "11px system-ui";
+        ctx.fillText("Esperando velas…", 10, 20);
+        return;
+      }
+
+      const padLeft = 40;
+      const padRight = 8;
+      const padTop = 8;
+      const padBottom = 20;
+      const w = rect.width;
+      const h = rect.height;
+
+      // Rango de precios
+      let minP = Infinity;
+      let maxP = -Infinity;
+      for (const c of candles) {
+        if (c.low < minP) minP = c.low;
+        if (c.high > maxP) maxP = c.high;
+      }
+      if (!isFinite(minP) || !isFinite(maxP)) return;
+      if (minP === maxP) {
+        minP *= 0.99;
+        maxP *= 1.01;
+      }
+
+      const priceRange = maxP - minP;
+      const pxPerPrice = (h - padTop - padBottom) / priceRange;
+
+      function yFromPrice(price) {
+        return padTop + (maxP - price) * pxPerPrice;
+      }
+
+      // Grid horizontal + labels
+      ctx.strokeStyle = "#1f2933";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.font = "10px system-ui";
+      ctx.fillStyle = "#9ca3af";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+
+      const gridLines = 4;
+      for (let i = 0; i <= gridLines; i++) {
+        const frac = i / gridLines;
+        const p = minP + frac * priceRange;
+        const y = yFromPrice(p);
+        ctx.beginPath();
+        ctx.moveTo(padLeft, y);
+        ctx.lineTo(w - padRight, y);
+        ctx.stroke();
+        ctx.fillText(formatNumber(p, 4), 4, y);
+      }
+      ctx.setLineDash([]);
+
+      // Dibujar velas
+      const n = candles.length;
+      const drawableWidth = w - padLeft - padRight;
+      const step = drawableWidth / Math.max(n, 1);
+      const bodyWidth = Math.max(3, step * 0.6);
+
+      for (let i = 0; i < n; i++) {
+        const c = candles[i];
+        const xCenter = padLeft + i * step + step / 2;
+
+        const yHigh = yFromPrice(c.high);
+        const yLow = yFromPrice(c.low);
+        const yOpen = yFromPrice(c.open);
+        const yClose = yFromPrice(c.close);
+
+        const isBull = c.close >= c.open;
+        const color = isBull ? "#0ecb81" : "#f6465d";
+
+        // mecha
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(xCenter, yHigh);
+        ctx.lineTo(xCenter, yLow);
+        ctx.stroke();
+
+        // cuerpo
+        const bodyTop = Math.min(yOpen, yClose);
+        const bodyBottom = Math.max(yOpen, yClose);
+        const bodyHeight = Math.max(1, bodyBottom - bodyTop);
+
+        ctx.fillStyle = color;
+        ctx.fillRect(
+          xCenter - bodyWidth / 2,
+          bodyTop,
+          bodyWidth,
+          bodyHeight
+        );
       }
     }
 
@@ -1592,6 +1757,7 @@
         const data = await res.json();
 
         closes = [];
+        candles = [];
         atr = null;
         prevClose = null;
         utTrend = null;
@@ -1603,12 +1769,15 @@
 
         for (let i = 0; i < data.length; i++) {
           const row = data[i];
+          const open = parseFloat(row[1]);
           const high = parseFloat(row[2]);
           const low = parseFloat(row[3]);
           const close = parseFloat(row[4]);
           const closeTime = row[6];
 
           closes.push(close);
+          candles.push({ open, high, low, close, time: closeTime });
+
           if (i === data.length - 1) lastPrice = close;
 
           // ATR
@@ -1653,12 +1822,19 @@
           }
         }
 
+        // Limitar velas
+        if (candles.length > MAX_CANDLES) {
+          candles = candles.slice(candles.length - MAX_CANDLES);
+        }
+
         setPriceDisplay(symbol, lastPrice);
         setPriceChangeDisplay(closes[0], lastPrice);
         updateEmaDisplay(symbol);
         lastCloseEl.textContent = formatPriceBySymbol(symbol, lastPrice);
         lastCandleInfo.textContent =
           `Histórico precargado (${closes.length} velas)`;
+
+        drawCandles();
       } catch (err) {
         console.error("Error al cargar klines:", err);
         lastCandleInfo.textContent =
@@ -1709,6 +1885,7 @@
         socket.onmessage = (event) => {
           const data = JSON.parse(event.data);
           const k = data.k;
+          const open = parseFloat(k.o);
           const close = parseFloat(k.c);
           const high = parseFloat(k.h);
           const low = parseFloat(k.l);
@@ -1722,6 +1899,7 @@
             setPriceChangeDisplay(closes[0], lastPrice);
           }
 
+          // Actualizar velas para el gráfico
           if (isFinal) {
             closes.push(close);
             if (closes.length > 400) closes.shift();
@@ -1772,12 +1950,37 @@
               }
             }
 
+            // Cerrar vela en array
+            candles.push({ open, high, low, close, time: closeTime });
+            if (candles.length > MAX_CANDLES) {
+              candles = candles.slice(candles.length - MAX_CANDLES);
+            }
+
             updateZigZag(close, closeTime);
             analyzeElliottPattern();
             recomputeEntryModeAndSignals(close, symbol, closeTime);
+            drawCandles();
           } else {
+            // Vela en curso: actualizamos la última o la creamos
+            if (!candles.length) {
+              candles.push({ open, high, low, close, time: closeTime });
+            } else {
+              const last = candles[candles.length - 1];
+              if (last.time === closeTime) {
+                last.open = open;
+                last.high = high;
+                last.low = low;
+                last.close = close;
+              } else {
+                candles.push({ open, high, low, close, time: closeTime });
+                if (candles.length > MAX_CANDLES) {
+                  candles = candles.slice(candles.length - MAX_CANDLES);
+                }
+              }
+            }
             lastCandleInfo.textContent =
               `Vela en curso · ${formatTime(openTime)} → ${formatTime(closeTime)}`;
+            drawCandles();
           }
         };
       });
@@ -1785,12 +1988,13 @@
 
     // ===== EVENTOS UI =====
     connectBtn.addEventListener("click", () => {
-      initAudio();        // asegura que el contexto de audio se cree tras interacción del usuario
+      initAudio();
       connectStream();
     });
     symbolSelect.addEventListener("change", connectStream);
     intervalSelect.addEventListener("change", connectStream);
     window.addEventListener("load", connectStream);
+    window.addEventListener("resize", drawCandles);
   </script>
 </body>
 </html>
