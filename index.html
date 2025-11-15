@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>📈 Live Trading Analyzer PRO</title>
+  <title>📈 Live Trading Analyzer PRO + UT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -615,7 +615,7 @@
           <div class="brand-title">
             LIVE<span class="highlight">SCANNER</span> PRO
           </div>
-          <div class="brand-subtitle">EMAS · SEÑALES · BACKTEST EN TIEMPO REAL</div>
+          <div class="brand-subtitle">EMAS · UT STYLE · BACKTEST EN TIEMPO REAL</div>
         </div>
       </div>
       <div class="header-right">
@@ -641,6 +641,11 @@
               <option value="BNBUSDT">BNB/USDT</option>
               <option value="PEPEUSDT">PEPE/USDT</option>
               <option value="SOLUSDT">SOL/USDT</option>
+              <option value="LINKUSDT">LINK/USDT</option>
+              <option value="ADAUSDT">ADA/USDT</option>
+              <option value="ZECUSDT">ZEC/USDT</option>
+              <option value="DASHUSDT">DASH/USDT</option>
+              <option value="MLNUSDT">MLN/USDT</option>
             </select>
           </div>
         </div>
@@ -658,9 +663,9 @@
 
       <div class="toolbar-group">
         <div class="field">
-          <label>EMAs</label>
+          <label>EMAs / UT</label>
           <div class="field-row">
-            <span class="chip">Rápida 9 · Lenta 21</span>
+            <span class="chip">EMA 9/21 + ATR stop (UT style)</span>
           </div>
         </div>
         <button id="connectBtn">
@@ -671,6 +676,7 @@
     </div>
 
     <main>
+      <!-- LEFT -->
       <section class="card">
         <div class="card-header">
           <div class="card-title">SNAPSHOT DE MERCADO</div>
@@ -708,20 +714,30 @@
             </div>
           </div>
 
+          <!-- UT style metric -->
+          <div class="metric">
+            <div class="metric-label">UT Bot (demo ATR stop)</div>
+            <div id="utTrendLabel" class="metric-value sm">– – –</div>
+            <div class="metric-sub">
+              <span id="utLineText">Línea dinámica: – – –</span>
+            </div>
+          </div>
+
           <div class="signal-banner" id="signalBanner">
             <div id="signalTag" class="tag tag-flat">Sin señal</div>
             <div class="signal-detail">
-              <span id="signalText">Esperando el primer cruce de EMAs…</span>
+              <span id="signalText">Esperando el primer cruce/señal…</span>
               <span id="signalMeta" class="mono">– – –</span>
             </div>
           </div>
         </div>
       </section>
 
+      <!-- RIGHT -->
       <section class="card">
         <div class="card-header">
           <div class="card-title">HISTORIAL & ESTADÍSTICAS</div>
-          <div class="pill">EMAs · Cruces · Trades simulados</div>
+          <div class="pill">EMAs · UT style · Trades simulados</div>
         </div>
         <div class="card-body">
           <div class="stats-grid">
@@ -753,6 +769,7 @@
                 <tr>
                   <th>Hora</th>
                   <th>Tipo</th>
+                  <th>Estrategia</th>
                   <th>Precio</th>
                   <th>EMA9</th>
                   <th>EMA21</th>
@@ -776,13 +793,14 @@
       </div>
       <div class="footer-section">
         <span class="hint">
-          Guardá este archivo como <strong>trading-analyzer-pro-v2.html</strong> y abrilo en el navegador.
+          Guardá este archivo como <strong>trading-analyzer-pro-ut.html</strong> y abrilo en el navegador.
         </span>
       </div>
     </footer>
   </div>
 
   <script>
+    // ===== ESTADO GLOBAL =====
     let socket = null;
     let closes = [];
     let ema9 = null;
@@ -792,13 +810,20 @@
     let prevEma9 = null;
     let prevEma21 = null;
 
-    const K_EMA9 = 2 / (9 + 1);
-    const K_EMA21 = 2 / (21 + 1);
+    // UT style (ATR trailing stop)
+    const ATR_PERIOD = 10;
+    const ATR_MULT = 1.5;
+    let atr = null;
+    let prevClose = null;
+    let utTrend = null;     // "LONG" | "SHORT" | "FLAT"
+    let utLine = null;
 
-    let signals = [];
-    let trades = [];
-    let openPosition = null;
+    // Backtest live
+    let signals = [];       // { type, price, ema9, ema21, ts, strategy }
+    let trades = [];        // { side, entry, exit, pnlPct, tsEntry, tsExit }
+    let openPosition = null; // { side, entryPrice, tsEntry }
 
+    // ===== HELPERS =====
     function formatNumber(num, decimals = 2) {
       if (num === null || num === undefined || Number.isNaN(num)) return "–";
       return Number(num).toLocaleString("en-US", {
@@ -813,7 +838,7 @@
       if (s.endsWith("USDT")) {
         if (s.startsWith("PEPE")) return formatNumber(price, 6);
         if (price >= 1000) return formatNumber(price, 1);
-        return formatNumber(price, 2);
+        return formatNumber(price, 3);
       }
       return formatNumber(price, 6);
     }
@@ -828,6 +853,7 @@
       return (price - prevEma) * k + prevEma;
     }
 
+    // ===== DOM =====
     const symbolSelect = document.getElementById("symbolSelect");
     const intervalSelect = document.getElementById("intervalSelect");
     const connectBtn = document.getElementById("connectBtn");
@@ -844,6 +870,9 @@
     const ema21Value = document.getElementById("ema21Value");
     const emaState = document.getElementById("emaState");
 
+    const utTrendLabel = document.getElementById("utTrendLabel");
+    const utLineText = document.getElementById("utLineText");
+
     const signalTag = document.getElementById("signalTag");
     const signalText = document.getElementById("signalText");
     const signalMeta = document.getElementById("signalMeta");
@@ -857,6 +886,7 @@
     const statWinrate = document.getElementById("statWinrate");
     const statAvgPnl = document.getElementById("statAvgPnl");
 
+    // ===== UI STATE =====
     function setConnectionState(state, message) {
       statusDot.classList.remove("ok", "off");
       if (state === "connected") {
@@ -887,7 +917,6 @@
         priceChange.innerHTML = '<span class="dot gray"></span> Sin variación';
         return;
       }
-
       const diff = currentPrice - basePrice;
       const pct = (diff / basePrice) * 100;
 
@@ -911,7 +940,6 @@
         emaState.textContent = "Esperando más velas para estabilizar EMAs…";
         return;
       }
-
       if (ema9 > ema21) {
         emaState.textContent = "Sesgo alcista (EMA 9 por encima de EMA 21)";
       } else if (ema9 < ema21) {
@@ -921,19 +949,36 @@
       }
     }
 
+    function updateUtDisplay(symbol) {
+      if (!utTrend || utLine === null || atr === null) {
+        utTrendLabel.textContent = "Sin tendencia definida";
+        utLineText.textContent = "Línea dinámica: – – –";
+        return;
+      }
+      if (utTrend === "LONG") {
+        utTrendLabel.textContent = "UT: LONG (sesgo alcista)";
+      } else if (utTrend === "SHORT") {
+        utTrendLabel.textContent = "UT: SHORT (sesgo bajista)";
+      } else {
+        utTrendLabel.textContent = "UT: FLAT";
+      }
+      utLineText.textContent =
+        "Línea dinámica: " + formatPriceBySymbol(symbol, utLine);
+    }
+
     function setSignalBanner(type, price, symbol, ts) {
       let cls = "tag-flat";
       let label = "Sin señal";
-      let text = "Esperando el primer cruce de EMAs…";
+      let text = "Esperando el primer cruce/señal…";
 
       if (type === "BUY") {
         cls = "tag-buy";
         label = "LONG";
-        text = "Cruce alcista: EMA 9 cruza por ENCIMA de EMA 21.";
+        text = "Señal alcista (cambio de sesgo).";
       } else if (type === "SELL") {
         cls = "tag-sell";
         label = "SHORT";
-        text = "Cruce bajista: EMA 9 cruza por DEBAJO de EMA 21.";
+        text = "Señal bajista (cambio de sesgo).";
       }
 
       signalTag.className = "tag " + cls;
@@ -941,13 +986,14 @@
       signalText.textContent = text;
 
       if (type && price != null) {
-        signalMeta.textContent = `${formatTime(ts)} · ${symbol.toUpperCase()} @ ${formatPriceBySymbol(symbol, price)}`;
+        signalMeta.textContent =
+          `${formatTime(ts)} · ${symbol.toUpperCase()} @ ${formatPriceBySymbol(symbol, price)}`;
       } else {
         signalMeta.textContent = "– – –";
       }
     }
 
-    function appendSignalRow(type, price, symbol, ema9Val, ema21Val, ts) {
+    function appendSignalRow(type, price, symbol, ema9Val, ema21Val, ts, strategy) {
       const tr = document.createElement("tr");
 
       const tdTime = document.createElement("td");
@@ -969,6 +1015,10 @@
       }
       tdType.appendChild(badge);
       tr.appendChild(tdType);
+
+      const tdStrat = document.createElement("td");
+      tdStrat.textContent = strategy || "EMA";
+      tr.appendChild(tdStrat);
 
       const tdPrice = document.createElement("td");
       tdPrice.textContent = formatPriceBySymbol(symbol, price);
@@ -995,7 +1045,8 @@
       }
       const sideText = openPosition.side === "LONG" ? "LONG" : "SHORT";
       const entry = formatPriceBySymbol(symbol, openPosition.entryPrice);
-      footerPosition.textContent = `${sideText} @ ${entry} · ${formatTime(openPosition.tsEntry)}`;
+      footerPosition.textContent =
+        `${sideText} @ ${entry} · ${formatTime(openPosition.tsEntry)}`;
     }
 
     function updateStatsUI() {
@@ -1008,7 +1059,7 @@
       if (totalTrades === 0) {
         statWinrate.textContent = "–";
         statAvgPnl.textContent = "–";
-        statWinrate.classList.remove("green","red");
+        statWinrate.classList.remove("green", "red");
         return;
       }
 
@@ -1022,7 +1073,7 @@
       statWinrate.textContent = winrate.toFixed(1) + "%";
       statAvgPnl.textContent = avgPnl.toFixed(2) + "%";
 
-      statWinrate.classList.remove("green","red");
+      statWinrate.classList.remove("green", "red");
       if (winrate >= 50) statWinrate.classList.add("green");
       else statWinrate.classList.add("red");
     }
@@ -1052,16 +1103,20 @@
       }
 
       if (!openPosition) {
-        openPosition = { side: sideNew, entryPrice: price, tsEntry: ts };
+        openPosition = {
+          side: sideNew,
+          entryPrice: price,
+          tsEntry: ts
+        };
       }
 
       updatePositionFooter(symbolSelect.value);
       updateStatsUI();
     }
 
-    function registerSignal(type, price, symbol, ema9Val, ema21Val, ts) {
-      signals.push({ type, price, ema9: ema9Val, ema21: ema21Val, ts });
-      appendSignalRow(type, price, symbol, ema9Val, ema21Val, ts);
+    function registerSignal(type, price, symbol, ema9Val, ema21Val, ts, strategy) {
+      signals.push({ type, price, ema9: ema9Val, ema21: ema21Val, ts, strategy });
+      appendSignalRow(type, price, symbol, ema9Val, ema21Val, ts, strategy);
       handleTradeLogic(type, price, ts);
       updateStatsUI();
     }
@@ -1075,6 +1130,11 @@
       lastPrice = null;
       lastSignal = null;
 
+      atr = null;
+      prevClose = null;
+      utTrend = null;
+      utLine = null;
+
       signals = [];
       trades = [];
       openPosition = null;
@@ -1085,39 +1145,80 @@
       setPriceDisplay(symbolSelect.value, null);
       setPriceChangeDisplay(null, null);
       updateEmaDisplay(symbolSelect.value);
+      updateUtDisplay(symbolSelect.value);
       setSignalBanner(null, null, symbolSelect.value, Date.now());
       updatePositionFooter(symbolSelect.value);
       updateStatsUI();
     }
 
+    // ===== DATA: HISTÓRICO =====
     async function loadInitialKlines(symbol, interval) {
-      const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=60`;
+      const url =
+        `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=60`;
       try {
         const res = await fetch(url);
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
-        closes = data.map(row => parseFloat(row[4]));
-        if (closes.length > 0) {
-          lastPrice = closes[closes.length - 1];
-        }
-        ema9 = null;
-        ema21 = null;
-        prevEma9 = null;
-        prevEma21 = null;
-        for (let i = 0; i < closes.length; i++) {
-          const c = closes[i];
-          ema9 = computeEMA(ema9, c, K_EMA9);
-          ema21 = computeEMA(ema21, c, K_EMA21);
-          if (i === closes.length - 2) {
-            prevEma9 = ema9;
-            prevEma21 = ema21;
+        closes = [];
+        atr = null;
+        prevClose = null;
+        utTrend = null;
+        utLine = null;
+
+        for (let i = 0; i < data.length; i++) {
+          const row = data[i];
+          const high = parseFloat(row[2]);
+          const low = parseFloat(row[3]);
+          const close = parseFloat(row[4]);
+
+          closes.push(close);
+          if (i === data.length - 1) lastPrice = close;
+
+          // ATR
+          let tr;
+          if (prevClose === null) {
+            tr = high - low;
+            atr = tr;
+          } else {
+            tr = Math.max(
+              high - low,
+              Math.abs(high - prevClose),
+              Math.abs(low - prevClose)
+            );
+            atr = atr === null
+              ? tr
+              : ((atr * (ATR_PERIOD - 1)) + tr) / ATR_PERIOD;
+          }
+          prevClose = close;
+
+          // EMAs
+          const K_EMA9 = 2 / (9 + 1);
+          const K_EMA21 = 2 / (21 + 1);
+          ema9 = computeEMA(ema9, close, K_EMA9);
+          ema21 = computeEMA(ema21, close, K_EMA21);
+
+          // UT style stop
+          if (utLine === null) {
+            utLine = close;
+            utTrend = "FLAT";
+          } else {
+            if (close > utLine) {
+              utTrend = "LONG";
+              utLine = Math.max(utLine, close - ATR_MULT * atr);
+            } else if (close < utLine) {
+              utTrend = "SHORT";
+              utLine = Math.min(utLine, close + ATR_MULT * atr);
+            }
           }
         }
+
         setPriceDisplay(symbol, lastPrice);
         setPriceChangeDisplay(closes[0], lastPrice);
         updateEmaDisplay(symbol);
+        updateUtDisplay(symbol);
         lastCloseEl.textContent = formatPriceBySymbol(symbol, lastPrice);
-        lastCandleInfo.textContent = `Histórico precargado (${closes.length} velas)`;
+        lastCandleInfo.textContent =
+          `Histórico precargado (${closes.length} velas)`;
       } catch (err) {
         console.error("Error al cargar klines:", err);
         lastCandleInfo.textContent =
@@ -1125,6 +1226,7 @@
       }
     }
 
+    // ===== DATA: STREAM =====
     function connectStream() {
       const symbol = symbolSelect.value.toUpperCase();
       const interval = intervalSelect.value;
@@ -1141,7 +1243,7 @@
 
       loadInitialKlines(symbol, interval).then(() => {
         const streamName = `${symbol.toLowerCase()}@kline_${interval}`;
-        const url = `wss://stream.binance.com/ws/${streamName}`; // puerto 443
+        const url = `wss://stream.binance.com/ws/${streamName}`;
 
         try {
           socket = new WebSocket(url);
@@ -1168,6 +1270,8 @@
           const data = JSON.parse(event.data);
           const k = data.k;
           const close = parseFloat(k.c);
+          const high = parseFloat(k.h);
+          const low = parseFloat(k.l);
           const isFinal = k.x;
           const openTime = k.t;
           const closeTime = k.T;
@@ -1179,8 +1283,28 @@
           }
 
           if (isFinal) {
+            // Actualizamos ATR
+            let tr;
+            if (prevClose === null) {
+              tr = high - low;
+              atr = tr;
+            } else {
+              tr = Math.max(
+                high - low,
+                Math.abs(high - prevClose),
+                Math.abs(low - prevClose)
+              );
+              atr = atr === null
+                ? tr
+                : ((atr * (ATR_PERIOD - 1)) + tr) / ATR_PERIOD;
+            }
+            prevClose = close;
+
             closes.push(close);
             if (closes.length > 300) closes.shift();
+
+            const K_EMA9 = 2 / (9 + 1);
+            const K_EMA21 = 2 / (21 + 1);
 
             prevEma9 = ema9;
             prevEma21 = ema21;
@@ -1194,6 +1318,23 @@
             lastCandleInfo.textContent =
               `Vela cerrada · ${formatTime(closeTime)} · Vol: ${parseFloat(k.v).toFixed(3)}`;
 
+            // UT style trailing stop
+            let prevUtTrend = utTrend;
+            if (utLine === null) {
+              utLine = close;
+              utTrend = "FLAT";
+            } else {
+              if (close > utLine) {
+                utTrend = "LONG";
+                utLine = Math.max(utLine, close - ATR_MULT * atr);
+              } else if (close < utLine) {
+                utTrend = "SHORT";
+                utLine = Math.min(utLine, close + ATR_MULT * atr);
+              }
+            }
+            updateUtDisplay(symbol);
+
+            // ---- Señales EMA cross ----
             if (
               prevEma9 !== null &&
               prevEma21 !== null &&
@@ -1206,12 +1347,18 @@
               } else if (prevEma9 >= prevEma21 && ema9 < ema21) {
                 newSignal = "SELL";
               }
-
               if (newSignal && newSignal !== lastSignal) {
                 lastSignal = newSignal;
                 setSignalBanner(newSignal, close, symbol, closeTime);
-                registerSignal(newSignal, close, symbol, ema9, ema21, closeTime);
+                registerSignal(newSignal, close, symbol, ema9, ema21, closeTime, "EMA");
               }
+            }
+
+            // ---- Señales UT style (cambio de tendencia) ----
+            if (prevUtTrend && utTrend && prevUtTrend !== utTrend) {
+              const utSignal = utTrend === "LONG" ? "BUY" : "SELL";
+              setSignalBanner(utSignal, close, symbol, closeTime);
+              registerSignal(utSignal, close, symbol, ema9, ema21, closeTime, "UT");
             }
           } else {
             lastCandleInfo.textContent =
@@ -1221,12 +1368,11 @@
       });
     }
 
-    document.getElementById("connectBtn").addEventListener("click", connectStream);
+    // ===== EVENTOS UI =====
+    connectBtn.addEventListener("click", connectStream);
     symbolSelect.addEventListener("change", connectStream);
     intervalSelect.addEventListener("change", connectStream);
-
     window.addEventListener("load", connectStream);
   </script>
 </body>
 </html>
-
