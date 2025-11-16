@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>📊 Binance Style – Live Scanner PRO v7 (Futuros + Spot)</title>
+  <title>📊 Binance Style – Live Scanner PRO v8 (Futuros + Spot + Noticias)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -27,11 +27,7 @@
       --radius-pill: 999px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
       height: 100%;
@@ -144,6 +140,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      position: relative;
     }
 
     /* HEADER */
@@ -175,11 +172,7 @@
       font-size: 18px;
     }
 
-    .brand-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
+    .brand-text { display: flex; flex-direction: column; gap: 2px; }
 
     .brand-title {
       font-weight: 600;
@@ -190,9 +183,7 @@
       gap: 6px;
     }
 
-    .brand-title span.highlight {
-      color: var(--accent-strong);
-    }
+    .brand-title span.highlight { color: var(--accent-strong); }
 
     .brand-subtitle {
       font-size: 11px;
@@ -272,6 +263,148 @@
       background: var(--red);
       box-shadow: 0 0 10px rgba(246,70,93,0.8);
     }
+
+    /* BOTÓN NOTIFICACIONES */
+    .notif-bell-btn {
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(75, 85, 99, 0.9);
+      background: radial-gradient(circle at top, #141823, #050714);
+      color: #e5e7eb;
+      font-size: 11px;
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      position: relative;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .notif-bell-btn:hover {
+      filter: brightness(1.08);
+      border-color: rgba(148,163,184,0.9);
+    }
+
+    .bell-icon { font-size: 14px; }
+    .bell-label { font-size: 10px; }
+
+    .notif-bell-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #f97316;
+      box-shadow: 0 0 10px rgba(249,115,22,0.9);
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      display: none;
+    }
+
+    /* DROPDOWN NOTIFICACIONES */
+    .notif-dropdown {
+      position: absolute;
+      top: 60px;
+      right: 18px;
+      z-index: 1000;
+      pointer-events: auto;
+    }
+
+    .notif-dropdown-inner {
+      width: 320px;
+      max-height: 320px;
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: radial-gradient(circle at top, #0b0f1c, #020309);
+      box-shadow: 0 24px 50px rgba(0,0,0,0.9);
+      padding: 8px 8px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .notif-dropdown-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .notif-dropdown-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+
+    .notif-clear-btn {
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(75, 85, 99, 0.9);
+      background: rgba(15,23,42,0.9);
+      color: #9ca3af;
+      font-size: 10px;
+      padding: 3px 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+    }
+
+    .notif-clear-btn:hover {
+      filter: brightness(1.1);
+      border-color: rgba(148,163,184,0.9);
+    }
+
+    .notifications-list {
+      max-height: 240px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .notif-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 11px;
+      padding: 4px 6px;
+      border-radius: 10px;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(31, 41, 55, 0.9);
+    }
+
+    .notif-badge {
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      flex-shrink: 0;
+    }
+
+    .notif-badge.long {
+      background: var(--green-soft);
+      color: #d1fae5;
+      border: 1px solid rgba(14,203,129,1);
+    }
+
+    .notif-badge.short {
+      background: var(--red-soft);
+      color: #fee2e2;
+      border: 1px solid rgba(246,70,93,1);
+    }
+
+    .notif-badge.flat {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      border: 1px solid rgba(243,186,47,0.9);
+    }
+
+    .notif-body { display:flex; flex-direction:column; gap:1px; }
+    .notif-text { color: var(--text-soft); }
+    .notif-meta { font-size: 10px; color: #9ca3af; }
+    .notif-empty { font-size: 11px; color: #6b7280; padding: 2px 2px; }
 
     /* MODE TABS */
     .mode-tabs {
@@ -548,7 +681,7 @@
     .dot.red   { background: var(--red); box-shadow: 0 0 8px rgba(246,70,93,0.9); }
     .dot.gray  { background: #6b7280; }
 
-    /* ENTRY MODE FUTUROS */
+    /* ENTRY MODE */
     .entry-mode {
       margin-top: 4px;
       padding: 10px 12px;
@@ -634,9 +767,7 @@
       color: #fee2e2;
     }
 
-    .cond-icon {
-      font-size: 12px;
-    }
+    .cond-icon { font-size: 12px; }
 
     /* CANDLE CHART */
     .chart-wrapper {
@@ -674,7 +805,7 @@
       border-radius: 12px;
     }
 
-    /* STATS / TABLE FUTUROS */
+    /* STATS FUTUROS */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -713,118 +844,51 @@
     .stat-value.green { color: var(--green); }
     .stat-value.red   { color: var(--red); }
 
-    /* NOTIFICACIONES FUTUROS */
-    .notifications-panel {
-      margin-bottom: 6px;
-      padding: 6px 8px 6px;
+    /* SIGNAL BANNER */
+    .signal-banner {
+      margin-top: 4px;
+      padding: 8px 10px;
       border-radius: 14px;
       border: 1px solid rgba(55, 65, 81, 0.95);
-      background: radial-gradient(circle at left, rgba(15,23,42,0.95), #020309);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .notifications-header {
+      background: radial-gradient(circle at right, rgba(243,186,47,0.1), rgba(5,7,20,1));
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 2px;
+      gap: 10px;
+      font-size: 12px;
     }
 
-    .notifications-title {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: var(--muted);
-    }
-
-    .notif-clear-btn {
+    .signal-banner .tag {
+      padding: 4px 10px;
       border-radius: var(--radius-pill);
-      border: 1px solid rgba(75, 85, 99, 0.9);
-      background: rgba(15,23,42,0.9);
-      color: #9ca3af;
-      font-size: 10px;
-      padding: 3px 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      cursor: pointer;
-    }
-
-    .notif-clear-btn:hover {
-      filter: brightness(1.1);
-      border-color: rgba(148,163,184,0.9);
-    }
-
-    .notifications-list {
-      max-height: 110px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .notif-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
       font-size: 11px;
-      padding: 4px 6px;
-      border-radius: 10px;
-      background: rgba(15,23,42,0.95);
-      border: 1px solid rgba(31, 41, 55, 0.9);
-    }
-
-    .notif-badge {
-      padding: 2px 7px;
-      border-radius: 999px;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
+      font-weight: 700;
       letter-spacing: 0.12em;
-      flex-shrink: 0;
+      text-transform: uppercase;
     }
 
-    .notif-badge.long {
+    .tag-buy {
       background: var(--green-soft);
-      color: #d1fae5;
       border: 1px solid rgba(14,203,129,1);
+      color: #d1fae5;
     }
 
-    .notif-badge.short {
+    .tag-sell {
       background: var(--red-soft);
-      color: #fee2e2;
       border: 1px solid rgba(246,70,93,1);
+      color: #fee2e2;
     }
 
-    .notif-badge.flat {
+    .tag-flat {
       background: var(--accent-soft);
-      color: var(--accent-strong);
       border: 1px solid rgba(243,186,47,0.9);
+      color: var(--accent-strong);
     }
 
-    .notif-body {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-    }
+    .signal-detail { display:flex; flex-direction:column; gap:2px; }
+    .signal-detail span { font-size:11px; color:var(--text-soft); }
 
-    .notif-text {
-      color: var(--text-soft);
-    }
-
-    .notif-meta {
-      font-size: 10px;
-      color: #9ca3af;
-    }
-
-    .notif-empty {
-      font-size: 11px;
-      color: #6b7280;
-      padding: 2px 2px;
-    }
-
-    /* PANEL ASESOR FUTUROS */
+    /* ASESOR FUTUROS */
     .entry-check-panel {
       margin-bottom: 6px;
       padding: 7px 8px 7px;
@@ -863,9 +927,7 @@
       box-shadow: 0 0 14px rgba(243,186,47,0.7);
     }
 
-    .entry-check-btn:hover {
-      filter: brightness(1.05);
-    }
+    .entry-check-btn:hover { filter: brightness(1.05); }
 
     .entry-check-result {
       font-size: 11px;
@@ -896,6 +958,7 @@
       color: #e5e7eb;
     }
 
+    /* TABLA SEÑALES FUTUROS */
     .signals-table-wrapper {
       max-height: 230px;
       overflow: hidden auto;
@@ -967,50 +1030,7 @@
       color: var(--text-soft);
     }
 
-    .signal-banner {
-      margin-top: 4px;
-      padding: 8px 10px;
-      border-radius: 14px;
-      border: 1px solid rgba(55, 65, 81, 0.95);
-      background: radial-gradient(circle at right, rgba(243,186,47,0.1), rgba(5,7,20,1));
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 12px;
-    }
-
-    .signal-banner .tag {
-      padding: 4px 10px;
-      border-radius: var(--radius-pill);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .tag-buy {
-      background: var(--green-soft);
-      border: 1px solid rgba(14,203,129,1);
-      color: #d1fae5;
-    }
-
-    .tag-sell {
-      background: var(--red-soft);
-      border: 1px solid rgba(246,70,93,1);
-      color: #fee2e2;
-    }
-
-    .tag-flat {
-      background: var(--accent-soft);
-      border: 1px solid rgba(243,186,47,0.9);
-      color: var(--accent-strong);
-    }
-
-    .signal-detail { display:flex; flex-direction:column; gap:2px; }
-    .signal-detail span { font-size:11px; color:var(--text-soft); }
-
-    /* SPOT – Radar */
+    /* SPOT GRID */
     .spot-grid {
       display: grid;
       grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
@@ -1021,12 +1041,7 @@
       .spot-grid { grid-template-columns: minmax(0, 1fr); }
     }
 
-    .range-block {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 4px;
-    }
+    .range-block { display:flex; flex-direction:column; gap:6px; margin-top:4px; }
 
     .range-row {
       display: grid;
@@ -1060,19 +1075,86 @@
       width: 0;
     }
 
-    .spot-zone-text {
-      font-size: 12px;
-      color: var(--text-soft);
+    .spot-zone-text { font-size: 12px; color: var(--text-soft); }
+    .spot-zone-text strong { color: #e5e7eb; }
+    .spot-emphasis { font-size: 11px; color: #d1fae5; }
+
+    /* CARD FULL SPAN (para noticias SPOT) */
+    .card.full-span { grid-column: 1 / -1; }
+
+    /* NOTICIAS MERCADO */
+    .news-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
     }
 
-    .spot-zone-text strong {
+    .news-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+
+    .news-refresh-btn {
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(75, 85, 99, 0.9);
+      background: rgba(15,23,42,0.9);
       color: #e5e7eb;
+      font-size: 10px;
+      padding: 3px 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .spot-emphasis {
-      font-size: 11px;
-      color: #d1fae5;
+    .news-refresh-btn:hover {
+      filter: brightness(1.08);
+      border-color: rgba(148,163,184,0.9);
     }
+
+    .news-list {
+      max-height: 220px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .news-item {
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(15,23,42,0.98);
+      border: 1px solid rgba(31,41,55,0.95);
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .news-item-source {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #9ca3af;
+    }
+
+    .news-item-title { color: #e5e7eb; }
+
+    .news-item-title a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .news-item-title a:hover { text-decoration: underline; }
+
+    .news-item-meta { font-size: 10px; color: #9ca3af; }
+
+    .news-empty { font-size: 11px; color: #6b7280; padding: 4px 2px; }
 
     /* FOOTER */
     footer {
@@ -1152,8 +1234,26 @@
           <div id="statusDot" class="connection-dot off"></div>
           <span id="statusText">Desconectado</span>
         </div>
+        <button id="notifToggleBtn" type="button" class="notif-bell-btn">
+          <span class="bell-icon">🔔</span>
+          <span class="bell-label">Alertas</span>
+          <span id="notifBellDot" class="notif-bell-dot"></span>
+        </button>
       </div>
     </header>
+
+    <!-- Dropdown de notificaciones -->
+    <div id="notifDropdown" class="notif-dropdown" style="display:none;">
+      <div class="notif-dropdown-inner">
+        <div class="notif-dropdown-header">
+          <div class="notif-dropdown-title">Notificaciones de tendencia</div>
+          <button id="clearNotifBtn" type="button" class="notif-clear-btn">Limpiar</button>
+        </div>
+        <div id="notificationsList" class="notifications-list">
+          <div class="notif-empty">Sin notificaciones todavía.</div>
+        </div>
+      </div>
+    </div>
 
     <!-- TABS FUTUROS / SPOT -->
     <div class="mode-tabs">
@@ -1199,7 +1299,7 @@
         <div class="field">
           <label>Setup</label>
           <div class="field-row">
-            <span class="chip">Futuros: EMAs + ATR + UT + Elliott asistente · Spot: EMA200D + rangos</span>
+            <span class="chip">Futuros: EMAs + ATR + UT + Elliott asistente · Spot: EMA200D + rangos + noticias</span>
           </div>
         </div>
         <button id="connectBtn">
@@ -1332,17 +1432,6 @@
             </div>
           </div>
 
-          <!-- NOTIFICACIONES DE TENDENCIA -->
-          <div class="notifications-panel">
-            <div class="notifications-header">
-              <div class="notifications-title">Notificaciones de tendencia</div>
-              <button id="clearNotifBtn" type="button" class="notif-clear-btn">Limpiar</button>
-            </div>
-            <div id="notificationsList" class="notifications-list">
-              <div class="notif-empty">Sin notificaciones todavía.</div>
-            </div>
-          </div>
-
           <!-- ASESOR FUTUROS “¿ENTRO AHORA?” -->
           <div class="entry-check-panel">
             <div class="entry-check-header">
@@ -1383,7 +1472,7 @@
         </div>
         <div class="card-body">
           <div class="spot-grid">
-            <!-- Izquierda: precio + EMA200 + zona -->
+            <!-- Izquierda -->
             <div>
               <div class="metrics-grid">
                 <div class="metric primary">
@@ -1452,7 +1541,7 @@
               </div>
             </div>
 
-            <!-- Derecha: volumen y presión -->
+            <!-- Derecha -->
             <div>
               <div class="stat-card" style="margin-bottom:8px;">
                 <div class="stat-label">Volumen SPOT 24h</div>
@@ -1506,6 +1595,28 @@
           </ul>
         </div>
       </section>
+
+      <!-- Noticias mercado cripto -->
+      <section class="card full-span">
+        <div class="card-header">
+          <div class="card-title">Noticias del mercado cripto</div>
+          <div class="pill">Titulares en vivo (fuente externa)</div>
+        </div>
+        <div class="card-body">
+          <div class="news-header">
+            <div class="news-title">Últimas noticias</div>
+            <button id="refreshNewsBtn" type="button" class="news-refresh-btn">
+              <span>↻</span> Actualizar
+            </button>
+          </div>
+          <div id="newsList" class="news-list">
+            <div class="news-empty">Cargando noticias de mercado…</div>
+          </div>
+          <div style="margin-top:6px; font-size:10px; color:var(--muted);">
+            Info sólo informativa. No es recomendación financiera ni reemplaza tu propio análisis.
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer>
@@ -1519,14 +1630,14 @@
       </div>
       <div class="footer-section">
         <span class="hint">
-          Guardá este archivo como <strong>scanner-binance-pro-v7-futuros-spot-loading.html</strong> y abrilo en el navegador.
+          Guardá este archivo como <strong>scanner-binance-pro-v8-futuros-spot-news.html</strong> y abrilo en el navegador.
         </span>
       </div>
     </footer>
   </div>
 
   <script>
-    // ===== ESTADO GLOBAL GENERAL =====
+    // ===== ESTADO GLOBAL =====
     let socket = null;
     let closes = [];
     let ema9 = null;
@@ -1535,24 +1646,24 @@
     let prevEma9 = null;
     let prevEma21 = null;
 
-    // Candles OHLC para el gráfico (Futuros)
+    // Candles
     let candles = [];
     const MAX_CANDLES = 120;
 
-    // ATR / UT style
+    // ATR / UT
     const ATR_PERIOD = 10;
     const ATR_MULT = 1.5;
-    const ATR_MIN_PCT = 0.0015; // 0.15%
+    const ATR_MIN_PCT = 0.0015;
     let atr = null;
     let prevClose = null;
     let utTrend = null;
     let utLine = null;
 
-    // Confluencia Futuros
-    let entryMode = "NO_TRADE";     // "NO_TRADE" | "ONLY_LONG" | "ONLY_SHORT"
+    // Entry mode
+    let entryMode = "NO_TRADE";
     let prevEntryMode = "NO_TRADE";
 
-    // ZigZag / Elliott (informativo)
+    // ZigZag / Elliott
     const ZZ_THRESHOLD = 0.008;
     let zzLastDir = null;
     let zzLastPrice = null;
@@ -1560,28 +1671,27 @@
     let zzPivots = [];
     let elliottBias = "NEUTRAL";
 
-    // Backtest live Futuros
+    // Backtest
     let signals = [];
     let trades = [];
     let openPosition = null;
 
-    // Notifs
+    // Notificaciones
     let notifications = [];
+    let unreadNotifs = false;
 
-    // Modo actual UI
+    // Modo
     let currentMode = "futures";
 
-    // ===== SPOT CONTEXT =====
-    let spotCtx = null; // { symbol, ema200, min90, max90, min7, max7, lastDailyClose, low24, high24, lastPrice24, change24Percent, quoteVolume24 }
+    // Spot context
+    let spotCtx = null;
 
-    // ===== Audio FUTUROS =====
+    // Audio
     let audioCtx = null;
     function initAudio() {
       if (!audioCtx) {
         const AC = window.AudioContext || window.webkitAudioContext;
-        if (AC) {
-          audioCtx = new AC();
-        }
+        if (AC) audioCtx = new AC();
       }
     }
 
@@ -1612,7 +1722,7 @@
       }
     }
 
-    // ===== HELPERS =====
+    // Helpers
     function formatNumber(num, decimals = 2) {
       if (num === null || num === undefined || Number.isNaN(num)) return "–";
       return Number(num).toLocaleString("en-US", {
@@ -1701,11 +1811,15 @@
 
     const candleCanvas = document.getElementById("candleCanvas");
 
-    const notificationsList = document.getElementById("notificationsList");
-    const clearNotifBtn = document.getElementById("clearNotifBtn");
-
     const checkEntryBtn = document.getElementById("checkEntryBtn");
     const entryCheckResultEl = document.getElementById("entryCheckResult");
+
+    // Notif DOM
+    const notificationsList = document.getElementById("notificationsList");
+    const clearNotifBtn = document.getElementById("clearNotifBtn");
+    const notifToggleBtn = document.getElementById("notifToggleBtn");
+    const notifBellDot = document.getElementById("notifBellDot");
+    const notifDropdown = document.getElementById("notifDropdown");
 
     // SPOT dom
     const spotPriceEl = document.getElementById("spotPrice");
@@ -1725,12 +1839,16 @@
     const spotVolumeTextEl = document.getElementById("spotVolumeText");
     const spotPressureTextEl = document.getElementById("spotPressureText");
 
-    // LOADER DOM
+    // Noticias DOM
+    const newsListEl = document.getElementById("newsList");
+    const refreshNewsBtn = document.getElementById("refreshNewsBtn");
+
+    // Loader DOM
     const loaderOverlay = document.getElementById("loaderOverlay");
     const loaderFill = document.getElementById("loaderFill");
     const loaderPercent = document.getElementById("loaderPercent");
 
-    // ===== UI STATE =====
+    // ===== UI HELPERS =====
     function setConnectionState(state, message) {
       statusDot.classList.remove("ok", "off");
       if (state === "connected") {
@@ -1748,11 +1866,7 @@
     }
 
     function setPriceDisplay(symbol, price) {
-      if (price === null) {
-        priceValue.textContent = "– – –";
-        return;
-      }
-      priceValue.textContent = formatPriceBySymbol(symbol, price);
+      priceValue.textContent = price === null ? "– – –" : formatPriceBySymbol(symbol, price);
     }
 
     function setPriceChangeDisplay(basePrice, currentPrice) {
@@ -1763,7 +1877,6 @@
       }
       const diff = currentPrice - basePrice;
       const pct = (diff / basePrice) * 100;
-
       if (Math.abs(pct) < 0.01) {
         priceChange.className = "metric-variation neutral";
         priceChange.innerHTML = '<span class="dot gray"></span> ' + pct.toFixed(2) + "%";
@@ -1796,7 +1909,6 @@
 
     function setCondPill(el, ok, label) {
       el.classList.remove("ok", "bad");
-      if (!el) return;
       const textSpan = el.querySelector("span:nth-child(2)");
       if (textSpan) textSpan.textContent = label;
       const iconSpan = el.querySelector(".cond-icon");
@@ -2030,11 +2142,17 @@
 
         body.appendChild(text);
         body.appendChild(meta);
-
         item.appendChild(badge);
         item.appendChild(body);
 
         notificationsList.appendChild(item);
+      }
+    }
+
+    function setUnreadNotifsFlag(flag) {
+      unreadNotifs = flag;
+      if (notifBellDot) {
+        notifBellDot.style.display = flag ? "block" : "none";
       }
     }
 
@@ -2044,13 +2162,16 @@
         notifications = notifications.slice(notifications.length - 30);
       }
       renderNotifications();
+      setUnreadNotifsFlag(true);
     }
 
     function clearNotifications() {
       notifications = [];
       renderNotifications();
+      setUnreadNotifsFlag(false);
     }
 
+    // ===== RESET ESTADO =====
     function resetState() {
       closes = [];
       ema9 = null;
@@ -2076,6 +2197,7 @@
       candles = [];
       notifications = [];
       renderNotifications();
+      setUnreadNotifsFlag(false);
 
       signalsBody.innerHTML = "";
       lastCloseEl.textContent = "– – –";
@@ -2103,12 +2225,11 @@
 
       drawCandles();
 
-      // SPOT context se recalcela al cambiar símbolo/stream
       spotCtx = null;
       resetSpotUI();
     }
 
-    // ===== ZIGZAG & ELLIOTT =====
+    // ===== ZIGZAG / ELLIOTT =====
     function updateZigZag(close, ts) {
       if (zzLastPrice === null) {
         zzLastPrice = close;
@@ -2399,7 +2520,7 @@
         `<div>${mainMsg}</div><div style="margin-top:4px;opacity:0.85;">${detail}</div>`;
     }
 
-    // ===== GRÁFICO DE VELAS FUTUROS =====
+    // ===== GRÁFICO DE VELAS =====
     function drawCandles() {
       if (!candleCanvas) return;
       const ctx = candleCanvas.getContext("2d");
@@ -2600,12 +2721,10 @@
       }
     }
 
-    // ===== SPOT: RESET UI =====
+    // ===== SPOT RESET UI =====
     function resetSpotUI() {
-      if (spotSymbolLabel) {
-        const s = symbolSelect.value.toUpperCase();
-        spotSymbolLabel.textContent = `${s} · Diario`;
-      }
+      const s = symbolSelect.value.toUpperCase();
+      if (spotSymbolLabel) spotSymbolLabel.textContent = `${s} · Diario`;
       if (spotPriceEl) spotPriceEl.textContent = "– – –";
       if (spotChange24El) {
         spotChange24El.className = "metric-variation neutral";
@@ -2628,7 +2747,7 @@
       if (spotPressureTextEl) spotPressureTextEl.textContent = "Esperando datos…";
     }
 
-    // ===== SPOT: LOAD CONTEXT =====
+    // ===== SPOT CONTEXT =====
     async function loadSpotContext(symbol) {
       try {
         resetSpotUI();
@@ -2651,7 +2770,6 @@
         }
 
         const closesDaily = dailyData.map(row => parseFloat(row[4]));
-        const timesDaily = dailyData.map(row => row[6]);
 
         let ema200 = null;
         const K200 = 2 / (200 + 1);
@@ -2718,7 +2836,6 @@
         spotEma200El.textContent = formatPriceBySymbol(symbol, spotCtx.ema200);
       }
 
-      // Distancia a EMA200
       let distText = "–";
       let zoneLabel = "NEUTRO";
       let zoneDesc = "";
@@ -2749,7 +2866,6 @@
       if (spotZoneLabelEl) spotZoneLabelEl.textContent = zoneLabel;
       if (spotContextTextEl) spotContextTextEl.textContent = zoneDesc || "Esperando más datos para definir zona.";
 
-      // Rangos
       if (spotRange90BarEl && spotRange90TextEl) {
         const range = spotCtx.max90 - spotCtx.min90;
         if (range > 0) {
@@ -2792,7 +2908,6 @@
         }
       }
 
-      // Cambio 24h
       if (spotChange24El) {
         let cls = "metric-variation neutral";
         let inner = '<span class="dot gray"></span> 24h: –';
@@ -2838,6 +2953,74 @@
       }
     }
 
+    // ===== NOTICIAS MERCADO =====
+    function renderNewsPlaceholder(text) {
+      if (!newsListEl) return;
+      newsListEl.innerHTML = "";
+      const div = document.createElement("div");
+      div.className = "news-empty";
+      div.textContent = text;
+      newsListEl.appendChild(div);
+    }
+
+    async function fetchMarketNews() {
+      if (!newsListEl) return;
+      renderNewsPlaceholder("Cargando noticias de mercado…");
+
+      try {
+        const url = "https://min-api.cryptocompare.com/data/v2/news/?lang=EN";
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+
+        const data = await res.json();
+        const articles = Array.isArray(data.Data) ? data.Data.slice(0, 10) : [];
+
+        if (!articles.length) {
+          renderNewsPlaceholder("No se encontraron noticias en este momento.");
+          return;
+        }
+
+        newsListEl.innerHTML = "";
+
+        articles.forEach(a => {
+          const item = document.createElement("div");
+          item.className = "news-item";
+
+          const src = document.createElement("div");
+          src.className = "news-item-source";
+          src.textContent = (a.source || "Desconocido") + " · CRYPTO";
+
+          const title = document.createElement("div");
+          title.className = "news-item-title";
+          const link = document.createElement("a");
+          link.href = a.url || "#";
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = a.title || "Sin título";
+          title.appendChild(link);
+
+          const meta = document.createElement("div");
+          meta.className = "news-item-meta";
+          const ts = a.published_on ? new Date(a.published_on * 1000) : null;
+          const timeText = ts
+            ? ts.toLocaleString("es-AR", { hour12: false })
+            : "Fecha no disponible";
+          meta.textContent = timeText;
+
+          item.appendChild(src);
+          item.appendChild(title);
+          item.appendChild(meta);
+
+          newsListEl.appendChild(item);
+        });
+      } catch (err) {
+        console.error("Error noticias:", err);
+        renderNewsPlaceholder(
+          "No se pudieron cargar las noticias (CORS o red bloqueada). Probá desde otra red o más tarde."
+        );
+      }
+    }
+
     // ===== STREAM EN VIVO =====
     function connectStream() {
       const symbol = symbolSelect.value.toUpperCase();
@@ -2855,7 +3038,6 @@
       setConnectionState("connecting", "Cargando velas iniciales…");
 
       loadInitialKlines(symbol, interval).then(() => {
-        // SPOT context también se carga
         loadSpotContext(symbol);
 
         const streamName = `${symbol.toLowerCase()}@kline_${interval}`;
@@ -2899,7 +3081,6 @@
             setPriceChangeDisplay(closes[0], lastPrice);
           }
 
-          // SPOT radar se actualiza con el último precio
           if (spotCtx && spotCtx.symbol === symbol) {
             updateSpotUIFromLive();
           }
@@ -2985,7 +3166,7 @@
       });
     }
 
-    // ===== MODO UI FUTUROS / SPOT =====
+    // ===== MODO FUTUROS / SPOT =====
     function switchMode(mode) {
       if (mode === currentMode) return;
       currentMode = mode;
@@ -3010,11 +3191,11 @@
       }
     }
 
-    // ===== LOADER ANIM =====
+    // ===== LOADER =====
     function startLoader() {
       if (!loaderOverlay || !loaderFill || !loaderPercent) return;
       let progress = 0;
-      const duration = 3000; // 3 segundos
+      const duration = 3000;
       const steps = 100;
       const intervalMs = duration / steps;
 
@@ -3026,7 +3207,6 @@
 
         if (progress >= 100) {
           clearInterval(timer);
-          // Pequeña pausa y fade out
           setTimeout(() => {
             loaderOverlay.style.opacity = "0";
             loaderOverlay.style.pointerEvents = "none";
@@ -3038,7 +3218,7 @@
       }, intervalMs);
     }
 
-    // ===== EVENTOS UI =====
+    // ===== EVENTOS =====
     connectBtn.addEventListener("click", () => {
       initAudio();
       connectStream();
@@ -3052,25 +3232,60 @@
       connectStream();
     });
 
-    window.addEventListener("load", () => {
-      startLoader();
-      connectStream();
+    window.addEventListener("resize", drawCandles);
+
+    if (clearNotifBtn) {
+      clearNotifBtn.addEventListener("click", () => {
+        clearNotifications();
+      });
+    }
+
+    if (notifToggleBtn) {
+      notifToggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!notifDropdown) return;
+        const isVisible = notifDropdown.style.display !== "none";
+        notifDropdown.style.display = isVisible ? "none" : "block";
+        if (!isVisible) {
+          setUnreadNotifsFlag(false);
+        }
+      });
+    }
+
+    document.addEventListener("click", (e) => {
+      if (!notifDropdown) return;
+      if (notifDropdown.style.display === "none") return;
+      if (notifDropdown.contains(e.target) || (notifToggleBtn && notifToggleBtn.contains(e.target))) {
+        return;
+      }
+      notifDropdown.style.display = "none";
     });
 
-    window.addEventListener("resize", drawCandles);
-    clearNotifBtn.addEventListener("click", clearNotifications);
-    checkEntryBtn.addEventListener("click", () => {
-      initAudio();
-      runEntryNowAdvisor();
-    });
+    if (checkEntryBtn) {
+      checkEntryBtn.addEventListener("click", () => {
+        initAudio();
+        runEntryNowAdvisor();
+      });
+    }
 
     tabFutures.addEventListener("click", () => switchMode("futures"));
     tabSpot.addEventListener("click", () => switchMode("spot"));
 
-    // Render inicial notificaciones
+    if (refreshNewsBtn) {
+      refreshNewsBtn.addEventListener("click", () => {
+        fetchMarketNews();
+      });
+    }
+
+    // Inicial
     renderNotifications();
+
+    window.addEventListener("load", () => {
+      startLoader();
+      connectStream();
+      fetchMarketNews();
+    });
   </script>
 </body>
 </html>
-
 
